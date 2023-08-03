@@ -30,7 +30,8 @@ public class UserServiceImp implements UserService{
         }else{
             resultDTO.setState(false);
         }
-        return null;
+        System.out.println(resultDTO.getResult()!=null);
+        return resultDTO;
     }
 
     @Override
