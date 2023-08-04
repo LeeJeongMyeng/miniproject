@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
-//@CrossOrigin(origins = "http://localhost:8800",allowedHeaders = "", methods = {""} )
+//@CrossOrigin(origins = "http://localhost:8800")
 @RestController
 public class DataController {
 

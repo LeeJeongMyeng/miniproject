@@ -30,6 +30,4 @@ public class SampleApplication {
 		return new HiddenHttpMethodFilter();
 	}
 
-
-
 }

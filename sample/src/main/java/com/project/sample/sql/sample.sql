@@ -19,5 +19,4 @@ create table user3(
 insert into user3 (name,email,pwd,gender) value ('사용자','user@email.com','1111',1);
 
 
-select *
-from user3;
+select * from user3;
