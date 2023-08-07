@@ -14,7 +14,7 @@ public interface UserMapper {
     @Update("update user3 set name=#{name},pwd=#{pwd},gender=#{gender} where no = #{no}")
     public int editById(UserDTO userDTO);
 
-    @Update("update user3 set del= ture where no =#{no}")
+    @Update("update user3 set del= true where no =#{no}")
     public int delete(int no);
     @Insert("insert into user3 (name,email,pwd,gender) value (#{name},#{email},#{pwd},#{gender})")
     public int save(UserDTO userDTO);

@@ -36,16 +36,46 @@ public class UserServiceImp implements UserService{
 
     @Override
     public ResultDTO editById(UserDTO userDTO) {
-        return null;
+        resultDTO = new ResultDTO();
+        int state = dao.editById(userDTO);
+        System.out.println(state);
+        if (state == 1) {
+            resultDTO.setState(true);
+            resultDTO.setMessage("사용자 수정 성공");
+        } else {
+            resultDTO.setState(false);
+            resultDTO.setMessage("사용자 수정 실패");
+
+        }
+        return resultDTO;
     }
 
     @Override
     public ResultDTO delete(int no) {
-        return null;
+       resultDTO = new ResultDTO();
+        int state = dao.delete(no);
+        if (state ==1) {
+            resultDTO.setState(true);
+            resultDTO.setMessage("삭제성공");
+        } else {
+            resultDTO.setState(false);
+            resultDTO.setMessage("삭제실패");
+        }
+
+        return resultDTO;
     }
 
     @Override
     public ResultDTO save(UserDTO userDTO) {
-        return null;
+        resultDTO = new ResultDTO();
+        int state = dao.save(userDTO);
+        if (state == 1) {
+            resultDTO.setState(true);
+            resultDTO.setMessage("저장성공");
+        } else {
+            resultDTO.setState(false);
+            resultDTO.setMessage("삭제실패");
+        }
+        return resultDTO;
     }
 }

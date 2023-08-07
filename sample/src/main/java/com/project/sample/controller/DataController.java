@@ -1,6 +1,7 @@
 package com.project.sample.controller;
 
 import com.project.sample.dto.ResultDTO;
+import com.project.sample.dto.UserDTO;
 import com.project.sample.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +36,15 @@ public class DataController {
     }
 
     @PostMapping("/editById")
-    public ResultDTO editById() {
-        return null;
+    public ResultDTO editById(@RequestBody UserDTO userDTO) {
+        System.out.println(userDTO);
+        return service.editById(userDTO);
 
     }
 
     @DeleteMapping("/delete")
-    public ResultDTO delete() {
-        return null;
+    public ResultDTO delete(@RequestParam("no") int no) {
+        return service.delete(no);
 
     }
 

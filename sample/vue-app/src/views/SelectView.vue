@@ -45,7 +45,10 @@
 
 <script>
 export default {
-
+  name:'SelectView',
+  created() {
+    console.log(this.$route)
+  }
 }
 </script>
 

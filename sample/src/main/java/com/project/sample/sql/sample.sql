@@ -3,7 +3,7 @@ use sample;
 # 한글설정
 alter database sample default character set utf8 collate  utf8_general_ci;
 alter table user3 default charset = utf8;
-ALTER TABLE use1r3 CONVERT TO CHARSET UTF8;
+ALTER TABLE user3 CONVERT TO CHARSET UTF8;
 
 
 create table user3(
@@ -16,7 +16,7 @@ create table user3(
     regData datetime not null default now()
 );
 
-insert into user3 (name,email,pwd,gender) value ('사용자','user@email.com','1111',1);
+insert into user3 (name,email,pwd,gender) value ('사용자0','test@test.com','1111',0);
 
 
 select * from user3;

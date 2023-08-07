@@ -2,13 +2,14 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import axios from 'axios'
-import {store} from "core-js/internals/reflect-metadata";
+//import {store} from "core-js/internals/reflect-metadata";
+import store from './store/index.js'
 
 
 //createApp(App).use(router).mount('#app')
 const app = createApp(App)
 app.config.globalProperties.axios=axios;
-app.use(store).use(router).mount('#app')
+app.use(router).use(store).mount('#app')
 axios.defaults.baseURL='http://localhost:8080'
 
 

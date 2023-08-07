@@ -10,11 +10,15 @@
 
 import axios from "axios";
 
+const uForm = {no:1,name:'테스트2',email:'test@test.com',pwd:'1234',gender:true};
+const params = {
+  params:{no:1}
+}
 export default {
   name: 'HomeView',
   methods:{
     getData(){
-      axios.post('/findAll')
+      axios.delete('/delete',params)
           .then((response)=>{
             console.log(response)
           }).catch((error)=>{
