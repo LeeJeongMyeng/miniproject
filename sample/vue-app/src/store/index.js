@@ -1,12 +1,12 @@
 import {createStore} from "vuex";
 
-createStore({
+export default createStore({
     state(){
         return{
             user:{}
         }
     },
-    metations:{
+    mutations:{
         setUser(state,value){
             state.user = value;
         }

@@ -37,7 +37,7 @@ public class DataController {
 
     @PostMapping("/editById")
     public ResultDTO editById(@RequestBody UserDTO userDTO) {
-        System.out.println(userDTO);
+        System.out.println("editByIdController:"+userDTO);
         return service.editById(userDTO);
 
     }
@@ -49,8 +49,8 @@ public class DataController {
     }
 
     @PutMapping("/save")
-    public ResultDTO save() {
-        return null;
-
+    public ResultDTO save(@RequestBody UserDTO userDTO) {
+        return service.save(userDTO);
     }
+
 }

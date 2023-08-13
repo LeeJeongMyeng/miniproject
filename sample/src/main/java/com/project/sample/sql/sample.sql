@@ -16,7 +16,10 @@ create table user3(
     regData datetime not null default now()
 );
 
-insert into user3 (name,email,pwd,gender) value ('사용자0','test@test.com','1111',0);
+insert into user3 (name,email,pwd,gender) value ('사용자5','test@test.com','1111',0);
 
 
 select * from user3;
+
+
+

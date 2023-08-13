@@ -14,7 +14,7 @@ const routes = [
       import(/* webpackChunkName: "user" */ "../views/ListView.vue"),
   },
   {
-    path: "/user/findById/:name",
+    path: "/user/findById",
     name: "SelectView",
     component: () =>
       import(/* webpackChunkName: "user" */ "../views/SelectView.vue"),

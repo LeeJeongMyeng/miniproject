@@ -1,9 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './router/index'
 import axios from 'axios'
 //import {store} from "core-js/internals/reflect-metadata";
-import store from './store/index.js'
+import store from './store/index'
 
 
 //createApp(App).use(router).mount('#app')

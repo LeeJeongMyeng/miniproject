@@ -25,7 +25,8 @@
 
 <script>
 import axios from "axios";
-import store from "@/store/index";
+import store from "@/store";
+//import store from "vuex";
 
 export default {
   name:'ListView',
@@ -36,6 +37,7 @@ export default {
   },
   //해당 화면이 실행되었을 때 바로 실행
   created() {
+    console.log('List', this.$store.state.user)
     this.getData()
   },
   methods:{
@@ -57,8 +59,12 @@ export default {
       **/
 
       // this.$router.push({name:'SelectView',query:row})
-      store.commit('setUser',row)
+      this.$store.commit('setUser',row);
+      sessionStorage.setItem('setUser', this.base64)
       this.$router.push({name:'SelectView'})
+    },
+    base64(user){
+      return window.btoa(encodeURIComponent(JSON.stringify(user)))
     }
   }
 }

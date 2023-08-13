@@ -12,6 +12,25 @@
   </div>
 </template>
 
+<script>
+  export default {
+    created() {
+      const user = sessionStorage.getItem('setUser')
+      console.log(JSON.parse(user))
+      if(user){
+        console.log(user, this.base64(user))
+
+        // this.$store.commit('setUser',JSON.parse(user))
+      }
+    },
+    methods:{
+      base64(user){
+        return JSON.parse(encodeURIComponent(window.atob(user)))
+      }
+    }
+  }
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

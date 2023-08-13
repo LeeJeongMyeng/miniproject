@@ -30,7 +30,7 @@ public class UserServiceImp implements UserService{
         }else{
             resultDTO.setState(false);
         }
-        System.out.println(resultDTO.getResult()!=null);
+        System.out.println("findAll Service:"+resultDTO.getResult()!=null);
         return resultDTO;
     }
 
@@ -38,7 +38,7 @@ public class UserServiceImp implements UserService{
     public ResultDTO editById(UserDTO userDTO) {
         resultDTO = new ResultDTO();
         int state = dao.editById(userDTO);
-        System.out.println(state);
+        System.out.println("editByIdService:"+state);
         if (state == 1) {
             resultDTO.setState(true);
             resultDTO.setMessage("사용자 수정 성공");
@@ -74,7 +74,7 @@ public class UserServiceImp implements UserService{
             resultDTO.setMessage("저장성공");
         } else {
             resultDTO.setState(false);
-            resultDTO.setMessage("삭제실패");
+            resultDTO.setMessage("저장실패");
         }
         return resultDTO;
     }
