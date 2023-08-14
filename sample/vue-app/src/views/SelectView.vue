@@ -55,7 +55,7 @@ export default {
   },
   created() {
     const user = sessionStorage.getItem('setUser')
-    console.log(JSON.parse(user))
+    //console.log(JSON.parse(this.$store.state.user))
     this.result = this.$store.state.user;
   },
   methods:{

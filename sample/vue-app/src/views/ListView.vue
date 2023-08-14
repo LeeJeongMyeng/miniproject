@@ -60,7 +60,7 @@ export default {
 
       // this.$router.push({name:'SelectView',query:row})
       this.$store.commit('setUser',row);
-      sessionStorage.setItem('setUser', this.base64)
+      sessionStorage.setItem('setUser', this.base64(row))
       this.$router.push({name:'SelectView'})
     },
     base64(user){
