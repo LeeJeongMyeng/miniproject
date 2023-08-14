@@ -61,7 +61,7 @@ export default {
             console.log("UpdateView",res)
             if(res.data.state){
               this.$store.commit('setUser',this.result)
-              sessionStorage.setItem('setUser',JSON.parse(this.result))
+              sessionStorage.setItem('setUser',this.base64(this.result))
               this.cancle()
             }else{
               alert(res.data.message)
@@ -71,6 +71,9 @@ export default {
     },
     cancle(){
       this.$router.push({name:'SelectView'})
+    },
+    base64(user){
+      return window.btoa(encodeURIComponent(JSON.stringify(user)))
     }
   }
 }

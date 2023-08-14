@@ -79,16 +79,21 @@ export default {
         this.active.pwd=false;
       }
 
+      //console.log(this.result.name)
+
       //console.log(this.result)
 
       axios.put('/save',this.result)
           .then((res) => {
             console.log(res)
             this.$store.commit('setUser',res.data.result)
-            sessionStorage.setItem('setUser',JSON.stringify(res.data.result))
+            sessionStorage.setItem('setUser',this.base64(res.data.result))
             this.$router.push({name:'SelectView'})
           })
           .catch((err) => console.log(err))
+    },
+    base64(user){
+      return window.btoa(encodeURIComponent(JSON.stringify(user)))
     }
   }
 }

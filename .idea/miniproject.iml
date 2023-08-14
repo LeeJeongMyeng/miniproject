@@ -8,5 +8,18 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:5.3.29" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.3.29" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.29" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.28/lombok-1.18.28.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Maven: org.mybatis:mybatis:3.5.13" level="project" />
   </component>
 </module>

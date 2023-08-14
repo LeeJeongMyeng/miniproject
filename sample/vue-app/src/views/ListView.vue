@@ -63,6 +63,8 @@ export default {
       sessionStorage.setItem('setUser', this.base64(row))
       this.$router.push({name:'SelectView'})
     },
+
+    //암호화 => 데이터를 인코딩해서 암호화시킴
     base64(user){
       return window.btoa(encodeURIComponent(JSON.stringify(user)))
     }
