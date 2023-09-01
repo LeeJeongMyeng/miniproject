@@ -14,4 +14,8 @@ public class MemberServiceImp implements MemberService {
         this.dao = dao;
     }
 
+    @Override
+    public int Check_SignUp_email(String email) {
+        return dao.Check_SignUp_email(email);
+    }
 }

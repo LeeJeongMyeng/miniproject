@@ -4,6 +4,7 @@ import com.project.sample.dto.ResultDTO;
 import com.project.sample.dto.UserDTO;
 import com.project.sample.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 public class DataController {
 
     private final UserService service;
+
+    @Value("${ctg.ExampleString}")
+    private String expstring;
 
     @Autowired
     public DataController(UserService service) {
@@ -53,4 +57,8 @@ public class DataController {
         return service.save(userDTO);
     }
 
+    @RequestMapping("/Test")
+    public String test(){
+        return expstring;
+    }
 }

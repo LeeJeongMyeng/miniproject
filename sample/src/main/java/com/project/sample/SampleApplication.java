@@ -1,5 +1,7 @@
 package com.project.sample;
 
+import jdk.nashorn.internal.objects.NativeRegExp;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +12,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 public class SampleApplication {
 
-	public static void main(String[] args) {
+	@Value("${ctg.ExampleString}")
+	private String ExampleString;
+
+	public void ExampleString() throws Exception {
+		System.out.println(ExampleString);
+	}
+
+	public static void main(String[] args) throws Exception {
 		SpringApplication.run(SampleApplication.class, args);
+
 	}
 
 	@Bean
@@ -29,5 +39,10 @@ public class SampleApplication {
 	public HiddenHttpMethodFilter hiddenHttpMethodFilter(){
 		return new HiddenHttpMethodFilter();
 	}
+
+
+
+
+
 
 }
