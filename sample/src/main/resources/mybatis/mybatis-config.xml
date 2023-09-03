@@ -1,0 +1,17 @@
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"-->
+<!--        "http://mybatis.org/dtd/mybatis-3-config.dtd">-->
+<!--<configuration>-->
+
+<!--    <typeAliases>-->
+<!--&lt;!&ndash;       <typeAlias alias="member" type="com.project.sample.dto.Member"/>&ndash;&gt;-->
+<!--       <package name="com.project.sample.dto"/>-->
+<!--    </typeAliases>-->
+
+<!--    &lt;!&ndash; 2. 사용 XXXMapper.xml을 추가 &ndash;&gt;-->
+<!--    <mappers>-->
+<!--&lt;!&ndash;        <mapper resource="resource/Req1000_Mapper.xml"/>&ndash;&gt;-->
+<!--        <package name="com.project.sample.mapper"/>-->
+
+<!--    </mappers>-->
+<!--</configuration>-->

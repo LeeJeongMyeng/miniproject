@@ -1,12 +1,11 @@
 package com.project.sample.controller;
 
 
-import com.project.sample.service.FleamarketService;
+import com.project.sample.dto.Member;
 import com.project.sample.service.MemberService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,19 +24,32 @@ public class MemberController {
         this.service = service;
     }
 
-    @PostMapping(name = "/ctg/Check_SignUp_email")
-    public Object Check_SignUp_email(HttpServletRequest request, HttpServletResponse response) throws Exception{
 
-        String email = request.getParameter("email");
-        System.out.println(email);
-        JSONObject json = new JSONObject();
+
+    //이름/주민 중복검사
+    @PostMapping("/ctg/Check_SignUp_name")
+    public Map<String,Integer> Check_SignUp_name (@RequestBody Member member) throws Exception{
+        Map<String,Integer> map = new HashMap<String, Integer>();
+        map.put("checkNum",service.Check_SignUp_name(member));
+
+        return map;
+    }
+
+
+    //이메일 중복검사
+    @PostMapping("/ctg/Check_SignUp_email")
+//    public Object Check_SignUp_email(@RequestParam("email") String email) throws Exception{
+    public Map<String,Integer> Check_SignUp_email(@RequestBody Member member) throws Exception{
+
+        System.out.println(member.getEmail());
+        //JSONObject json = new JSONObject();
 
         Map<String,Integer> map = new HashMap<String, Integer>();
-        map.put("checkNum",service.Check_SignUp_email(email));
+        map.put("checkNum",service.Check_SignUp_email(member.getEmail()));
 
-        json.put("result",map);
+        //json.put("result",map);
 
-        return json;
+        return map;
     }
 
 }

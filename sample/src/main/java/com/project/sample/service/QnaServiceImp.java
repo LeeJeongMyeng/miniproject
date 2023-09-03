@@ -8,10 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public class QnaServiceImp implements QnaService {
 
-    private final QnaDao dao;
-    @Autowired
-    public QnaServiceImp(QnaDao dao) {
-        this.dao = dao;
-    }
 
 }

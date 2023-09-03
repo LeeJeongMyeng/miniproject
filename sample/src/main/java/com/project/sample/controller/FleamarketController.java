@@ -2,7 +2,6 @@ package com.project.sample.controller;
 
 
 import com.project.sample.service.FleamarketService;
-import com.project.sample.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 

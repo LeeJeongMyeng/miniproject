@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="pandora3_ojt" uuid="2c848946-5242-4046-b176-c69a042c08cd">
+    <data-source source="LOCAL" name="pandora3_ojt" uuid="4c4a4590-153b-4c76-819b-d091b310120f">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/pandora3_ojt</jdbc-url>
+      <jdbc-url>jdbc:mysql://192.168.219.103:3306/pandora3_ojt</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
