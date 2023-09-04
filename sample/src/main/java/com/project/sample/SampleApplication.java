@@ -1,5 +1,6 @@
 package com.project.sample;
 
+import com.project.sample.dto.Member;
 import jdk.nashorn.internal.objects.NativeRegExp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -8,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.lang.reflect.Field;
 
 @SpringBootApplication
 public class SampleApplication {
@@ -21,6 +24,9 @@ public class SampleApplication {
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(SampleApplication.class, args);
+
+
+
 
 	}
 
