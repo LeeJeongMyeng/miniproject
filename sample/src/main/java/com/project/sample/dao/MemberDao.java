@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface MemberDao {
     public int Check_SignUp_name(Member member);
     public int Check_SignUp_email(String email);
+    public int Ins_Ctg_Member(Member member);
 }

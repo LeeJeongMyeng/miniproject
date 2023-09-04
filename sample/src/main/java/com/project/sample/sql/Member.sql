@@ -1,11 +1,14 @@
 CREATE TABLE ctg_Member(
-                         userno         varchar(10) PRIMARY KEY, #유저번호
+                         userno         varchar(13) PRIMARY KEY, #유저번호
                          email          varchar(100),            #이메일
                          password       varchar(20),             #비밀번호
                          name           varchar(4),              #이름
                          personalNumber varchar(14),             #주민
                          phoneNumber    varchar(11),             #폰번호
-                         address        varchar(200),            #주소
+                         postcode       int,                     #우편번호
+                         address        varchar(100),            #주소
+                         extraAddress   varchar(100),            #부가주소
+                         detailAddress  varchar(100),            #상세주소
                          bnCheck        boolean,                 #사업자여부
                          state          boolean,                 #탈퇴여부
                          joinDate       date,                    #가입날짜
@@ -13,17 +16,65 @@ CREATE TABLE ctg_Member(
 );
 
 create table ctg_user_bs(
-    userno   varchar(10) primary key,
+    userno   varchar(13) primary key,
     bnNumber varchar(100)
 );
 
-drop TABLE CTG_MEMBER;
+drop TABLE ctg_user_bs;
+
+create table sequences
+(
+    name varchar(32),
+    currval bigint unsigned
+) engine = InnoDB;
+
+create procedure `create_sequence` (In seq_name text)
+    modifies sql data
+    deterministic
+begin
+    delete from sequences where name = seq_name;
+    insert into sequences values(seq_name, 0);
+end;
+
+create function `nextval` (seq_name varchar(32))
+    returns bigint unsigned
+    modifies sql data
+    deterministic
+begin
+    declare ret bigint unsigned;
+    update sequences set currval = currval + 1 where name = seq_name;
+    select currval into ret from sequences where name = seq_name limit 1;
+    return ret;
+end;
+
+
+call create_sequence('seq_member');
+
 
 SELECT * FROM CTG_MEMBER;
 
-INSERT INTO CTG_MEMBER VALUES ('9','aoddl56@nate.com','1111','이정명','950828-1111111','01052930247','창원',false,true,sysdate(),null);
+COMMIT;
+-- mybatis 회원가입 양식
+INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PERSONALNUMBER,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
 
-DELETE FROM CTG_MEMBER where userno = '9';
+INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',nextval('seq_member')),
+                               'email',
+                               'password',
+                               'name',
+                               'PERSONALNUMBER',
+                               'PHONENUMBER',
+                               1234,
+                               'ADDRESS',
+                               'EXTRAADDRESS',
+                               'DETAILADDRESS',
+                               FALSE,
+                               TRUE,
+                               SYSDATE(),
+                               NULL);
+
+
+
+DELETE FROM CTG_MEMBER;
 
 COMMIT ;
 
@@ -37,14 +88,7 @@ SELECT COUNT(*) FROM CTG_MEMBER
 where EMAIL = '';
 
 
+SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',0) FROM DUAL;
 
-INSERT INTO CTG_MEMBER VALUES (
-    '9',
-    'aoddl56@nate.com',
-    '1111',
-    '이정명',
-    '950828-1111111',
-    '01052930247',
-    '창원',
-    false,true,sysdate(),null
-    );
+
+

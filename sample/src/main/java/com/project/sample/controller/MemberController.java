@@ -52,4 +52,12 @@ public class MemberController {
         return map;
     }
 
+    //회원가입
+    @PostMapping("/ctg/Ins_Ctg_Member")
+    public Map<String,Integer> Ins_Ctg_Member(@RequestBody Member member){
+        Map<String,Integer> map = new HashMap<String, Integer>();
+        map.put("checkNum",service.Ins_Ctg_Member(member));
+        return map;
+    }
+
 }
