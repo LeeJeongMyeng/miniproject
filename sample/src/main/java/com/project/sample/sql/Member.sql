@@ -1,10 +1,10 @@
 CREATE TABLE ctg_Member(
-                         userno         varchar(13) PRIMARY KEY, #유저번호
+                         userno         int        PRIMARY KEY, #유저번호
                          email          varchar(100),            #이메일
-                         password       varchar(20),             #비밀번호
-                         name           varchar(4),              #이름
-                         personalNumber varchar(14),             #주민
-                         phoneNumber    varchar(11),             #폰번호
+                         password       varchar(100),             #비밀번호
+                         name           varchar(100),              #이름
+                         personalNumber varchar(100),             #주민
+                         phoneNumber    varchar(100),             #폰번호
                          postcode       int,                     #우편번호
                          address        varchar(100),            #주소
                          extraAddress   varchar(100),            #부가주소
@@ -20,7 +20,7 @@ create table ctg_user_bs(
     bnNumber varchar(100)
 );
 
-drop TABLE ctg_user_bs;
+drop TABLE ctg_Member;
 
 create table sequences
 (
@@ -55,9 +55,9 @@ SELECT * FROM CTG_MEMBER;
 
 COMMIT;
 -- mybatis 회원가입 양식
-INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PERSONALNUMBER,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
+# INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PERSONALNUMBER,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
 
-INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',nextval('seq_member')),
+INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
                                'email',
                                'password',
                                'name',
@@ -70,11 +70,12 @@ INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',n
                                FALSE,
                                TRUE,
                                SYSDATE(),
-                               NULL);
+                               NULL
+    );
 
+SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')) FROM DUAL;
 
-
-DELETE FROM CTG_MEMBER;
+DELETE FROM CTG_MEMBER WHERE USERNO = 2023090520;
 
 COMMIT ;
 
@@ -90,5 +91,7 @@ where EMAIL = '';
 
 SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',0) FROM DUAL;
 
-
+SELECT USERNO,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
+WHERE STATE = 1
+  AND EMAIL = 'z@nate.com';
 
