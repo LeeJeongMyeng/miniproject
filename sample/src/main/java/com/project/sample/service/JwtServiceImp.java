@@ -1,8 +1,6 @@
 package com.project.sample.service;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -46,5 +44,21 @@ public class JwtServiceImp implements JwtService{
                 .signWith(SignatureAlgorithm.HS256, signKey); //키와 함께 암호화
 
         return builder.compact();
+    }
+
+    @Override
+    public Claims getClaims(String token) {
+        if(token !=null && !"".equals(token)){
+            try{
+                byte[] secretkeyByte = DatatypeConverter.parseBase64Binary(secretkey);
+                Key signKey = new SecretKeySpec(secretkeyByte, SignatureAlgorithm.HS256.getJcaName());
+                return (Claims) Jwts.parser().setSigningKey(signKey).parseClaimsJws(token).getBody();
+            }catch (ExpiredJwtException e){
+                //만료됨
+            }catch (JwtException e){
+                //유효하지않음
+            }
+        }
+        return null;
     }
 }

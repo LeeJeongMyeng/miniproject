@@ -43,8 +43,6 @@ public class MemberServiceImp implements MemberService {
     @Override
     public int Ins_Ctg_Member(Member member) throws IllegalAccessException {
         //사업자도 추가해야함..
-
-
 //
 
         // Member 클래스 모든 필드를 가져 옴
@@ -126,6 +124,7 @@ public class MemberServiceImp implements MemberService {
             //일치한다면 이름을 암호화 해제하고 재할당
             if(pwdCheck){
                 memberInfo.setName(aes.decrypt(memberInfo.getName()));
+                System.out.println(memberInfo.getName());
                 memberInfo.setPassword(null);
             }else{
                 memberInfo = null;
