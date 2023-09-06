@@ -51,7 +51,7 @@ end;
 call create_sequence('seq_member');
 
 
-SELECT * FROM CTG_MEMBER;ma
+SELECT * FROM CTG_MEMBER;
 
 COMMIT;
 -- mybatis 회원가입 양식
