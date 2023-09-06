@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -44,6 +45,10 @@ public class SampleApplication {
 		return new HiddenHttpMethodFilter();
 	}
 
+	@Bean
+	MappingJackson2JsonView jsonView() {
+		return new MappingJackson2JsonView();
+	}
 
 
 
