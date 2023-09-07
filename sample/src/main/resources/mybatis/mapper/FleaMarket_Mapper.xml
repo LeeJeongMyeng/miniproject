@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.project.sample.dao.FleamarketDao">
+    <insert id="reg_FleaMarket" parameterType="FleamarketDto" >
+        INSERT INTO FLEAMARKET VALUES (
+         0,
+         #{userno,jdbcType=VARCHAR},
+         #{email,jdbcType=VARCHAR},
+         #{title,jdbcType=VARCHAR},
+         #{content,jdbcType=VARCHAR},
+         #{approvalCnt,jdbcType=NUMERIC},
+         #{curCnt,jdbcType=NUMERIC},
+         #{endDate,jdbcType=VARCHAR},
+         SYSDATE(),
+         SYSDATE()
+       )
+    </insert>
+
+    <select id="FleaMarket_get_fno_max" resultType="_int">
+        select max(FNO) from FLEAMARKET
+    </select>
+
+    <insert id="reg_FleaMarket_file" parameterType="FleamarketDto">
+        INSERT INTO FLEAMARKET_FILES VALUES (
+        #{fno,jdbcType=NUMERIC},
+        #{origin_file_name,jdbcType=VARCHAR},
+        #{uuid_file_name,jdbcType=VARCHAR}
+        )
+    </insert>
+
+</mapper>
