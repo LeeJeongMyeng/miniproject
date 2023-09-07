@@ -82,7 +82,7 @@ COMMIT ;
 -- 회원 이름/주민 중복여부
 SELECT COUNT(*) FROM CTG_MEMBER
 where NAME = #{name,jdbcType=VARCHAR}
-and PERSONALNUMBER = #{personalNumber,jdbcType=VARCHAR};
+and PERSONALNUMBER = #{personalNumber},jdbcType=VARCHAR};
 
 -- 회원 이메일 중복여부
 SELECT COUNT(*) FROM CTG_MEMBER
