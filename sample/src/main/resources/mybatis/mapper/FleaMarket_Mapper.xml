@@ -11,6 +11,8 @@
          #{email,jdbcType=VARCHAR},
          #{title,jdbcType=VARCHAR},
          #{content,jdbcType=VARCHAR},
+         #{address,jdbcType=VARCHAR},
+         #{detailAddress,jdbcType=VARCHAR},
          #{approvalCnt,jdbcType=NUMERIC},
          #{curCnt,jdbcType=NUMERIC},
          #{endDate,jdbcType=VARCHAR},
@@ -30,5 +32,46 @@
         #{uuid_file_name,jdbcType=VARCHAR}
         )
     </insert>
+
+<!--    <select id="get_FleaMarket_List" resultType="FleamarketDto">-->
+<!--        SELECT F.FNO, F.TITLE, SUBSTRING_INDEX(F.ADDRESS, ' ', 3) as ADDRESS, F.CURCNT, F.APPROVALCNT, date_format(F.REGDATE,'%Y-%m-%d') REGDATE, MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME-->
+<!--        FROM FLEAMARKET AS F-->
+<!--                 LEFT JOIN (-->
+<!--            SELECT FILES.FNO, FILES.UUID_FILE_NAME-->
+<!--            FROM FLEAMARKET_FILES FILES-->
+<!--            ORDER BY FILES.UUID_FILE_NAME &#45;&#45; 원하는 정렬 순서를 지정할 수 있습니다.-->
+<!--        ) AS F2 ON F.FNO = F2.FNO-->
+<!--        GROUP BY F.FNO-->
+<!--        ORDER BY F.REGDATE DESC;-->
+<!--    </select>-->
+
+    <select id="get_FleaMarket_List" parameterType="FleamarketDto" resultType="FleamarketDto">
+        SELECT
+            (@rownum := @rownum + 1) as ROWNUM,
+            F.*,
+            MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+        FROM (SELECT  FNO,
+                      TITLE,
+                      SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
+                      CURCNT,
+                      date_format(REGDATE,'%Y-%m-%d') REGDATE,
+                      APPROVALCNT FROM FLEAMARKET
+              -- 검색조건문 구간
+              WHERE TITLE LIKE CONCAT('%','','%')
+
+             ) AS F LEFT JOIN (
+            SELECT FILES.FNO, FILES.UUID_FILE_NAME
+            FROM FLEAMARKET_FILES FILES
+            ORDER BY FILES.UUID_FILE_NAME
+        ) AS F2 ON F.FNO = F2.FNO,
+             (SELECT @rownum := 0) r
+        GROUP BY F.FNO
+        HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
+    </select>
+
+    <select id="get_FleaMarket_totCnt" resultType="_int">
+    SELECT COUNT(*) FROM FLEAMARKET
+    WHERE TITLE LIKE CONCAT('%','','%');
+    </select>
 
 </mapper>

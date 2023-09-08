@@ -1,4 +1,19 @@
 
+CREATE TABLE FLEAMARKET(
+    fno int PRIMARY KEY AUTO_INCREMENT,
+    userno varchar(100),
+    email varchar(100),
+    title varchar(200),
+    content varchar(10000),
+    address varchar(100),
+    detailAddress varchar(100),
+    approvalCnt int,
+    curCnt int,
+    endDate varchar(20),
+    regDate DATE,
+    uptDate DATE
+);
+
 
 CREATE TABLE FLEAMARKET_FILES(
     fno int,
@@ -7,6 +22,9 @@ CREATE TABLE FLEAMARKET_FILES(
 
 
 );
+
+DROP TABLE FLEAMARKET;
+
 -- 파일심기
 INSERT INTO FLEAMARKET_FILES VALUES (
     #{fno,jdbcType=NUMERIC},
@@ -23,3 +41,110 @@ DELETE FROM FLEAMARKET;
 DELETE FROM FLEAMARKET_FILES;
 
 select max(FNO) from FLEAMARKET;
+-- 리스트조회용
+
+
+
+SELECT * FROM FLEAMARKET INNER JOIN (
+        select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R) TMP
+GROUP BY FLEAMARKET.FNO;
+
+SELECT B.* FROM (
+) B WHERE ROWNUM=1;
+
+
+SELECT F.FNO,F.TITLE,F.ADDRESS,F.CURCNT,F.APPROVALCNT,F.REGDATE,F2.UUID_FILE_NAME FROM FLEAMARKET AS F
+    LEFT JOIN  (select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R) AS F2
+    ON F.FNO = F2.FNO;
+GROUP BY FNO;
+
+-- 전체 게시글에 대해 파일 하나씩들고와서 출력
+SELECT F.FNO, F.TITLE, SUBSTRING_INDEX(F.ADDRESS, ' ', 3) as ADDRESS, F.CURCNT, F.APPROVALCNT, date_format(F.REGDATE,'%Y-%m-%d') REGDATE, MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+FROM FLEAMARKET AS F
+         LEFT JOIN (
+    SELECT FILES.FNO, FILES.UUID_FILE_NAME
+    FROM FLEAMARKET_FILES FILES
+    ORDER BY FILES.UUID_FILE_NAME -- 원하는 정렬 순서를 지정할 수 있습니다.
+) AS F2 ON F.FNO = F2.FNO
+GROUP BY F.FNO
+ORDER BY F.REGDATE DESC;
+
+-- ROWNUM적용시켜서 출력
+SELECT
+    (@rownum := @rownum + 1) as ROWNUM,
+    F.FNO,
+    F.TITLE,
+    SUBSTRING_INDEX(F.ADDRESS, ' ', 3) as ADDRESS,
+    F.CURCNT,
+    F.APPROVALCNT,
+    date_format(F.REGDATE,'%Y-%m-%d') REGDATE,
+    MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+FROM FLEAMARKET AS F
+         LEFT JOIN (
+    SELECT FILES.FNO, FILES.UUID_FILE_NAME
+    FROM FLEAMARKET_FILES FILES
+    ORDER BY FILES.UUID_FILE_NAME -- 원하는 정렬 순서를 지정할 수 있습니다.
+) AS F2 ON F.FNO = F2.FNO,
+     (SELECT @rownum := 0) r
+GROUP BY F.FNO
+HAVING ROWNUM BETWEEN 1 AND 6;
+
+
+
+SELECT
+    (@rownum := @rownum + 1) as ROWNUM,
+    F.*,
+    MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+    FROM (SELECT  FNO,
+              TITLE,
+              SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
+              CURCNT,
+              date_format(REGDATE,'%Y-%m-%d') REGDATE,
+              APPROVALCNT FROM FLEAMARKET
+      -- 검색조건문 구간
+      WHERE TITLE LIKE CONCAT('%','','%')
+
+      ) AS F LEFT JOIN (
+    SELECT FILES.FNO, FILES.UUID_FILE_NAME
+    FROM FLEAMARKET_FILES FILES
+    ORDER BY FILES.UUID_FILE_NAME
+) AS F2 ON F.FNO = F2.FNO,
+     (SELECT @rownum := 0) r
+GROUP BY F.FNO
+HAVING ROWNUM BETWEEN 7 AND 12;
+
+SELECT  FNO,
+        TITLE,
+        SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
+        CURCNT,
+        date_format(REGDATE,'%Y-%m-%d') REGDATE,
+        APPROVALCNT FROM FLEAMARKET
+WHERE ADDRESS LIKE CONCAT('%','경기','%');
+
+
+select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R GROUP BY FNO;
+
+
+SELECT
+    (@rownum := @rownum + 1) as ROWNUM,
+    F.*,
+    MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+FROM (SELECT  FNO,
+              TITLE,
+              SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
+              CURCNT,
+              date_format(REGDATE,'%Y-%m-%d') REGDATE,
+              APPROVALCNT FROM FLEAMARKET
+      -- 검색조건문 구간
+      WHERE TITLE LIKE CONCAT('%','','%')
+
+     ) AS F LEFT JOIN (
+    SELECT FILES.FNO, FILES.UUID_FILE_NAME
+    FROM FLEAMARKET_FILES FILES
+    ORDER BY FILES.UUID_FILE_NAME
+) AS F2 ON F.FNO = F2.FNO,
+     (SELECT @rownum := 0) r
+GROUP BY F.FNO
+HAVING ROWNUM BETWEEN 1 AND 6;
+
+
