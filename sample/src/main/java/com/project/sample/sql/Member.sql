@@ -3,7 +3,6 @@ CREATE TABLE ctg_Member(
                          email          varchar(100),            #이메일
                          password       varchar(100),             #비밀번호
                          name           varchar(100),              #이름
-                         personalNumber varchar(100),             #주민
                          phoneNumber    varchar(100),             #폰번호
                          postcode       int,                     #우편번호
                          address        varchar(100),            #주소
@@ -55,13 +54,12 @@ SELECT * FROM CTG_MEMBER;
 
 COMMIT;
 -- mybatis 회원가입 양식
-# INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PERSONALNUMBER,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
+# INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
 
 INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
                                'email',
                                'password',
                                'name',
-                               'PERSONALNUMBER',
                                'PHONENUMBER',
                                1234,
                                'ADDRESS',
@@ -79,10 +77,7 @@ DELETE FROM CTG_MEMBER WHERE USERNO = 2023090520;
 
 COMMIT ;
 
--- 회원 이름/주민 중복여부
-SELECT COUNT(*) FROM CTG_MEMBER
-where NAME = #{name,jdbcType=VARCHAR}
-and PERSONALNUMBER = #{personalNumber},jdbcType=VARCHAR};
+
 
 -- 회원 이메일 중복여부
 SELECT COUNT(*) FROM CTG_MEMBER

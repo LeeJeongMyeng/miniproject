@@ -23,7 +23,15 @@ CREATE TABLE FLEAMARKET_FILES(
 
 );
 
-DROP TABLE FLEAMARKET;
+CREATE table application_FM(
+    ano int PRIMARY KEY AUTO_INCREMENT,
+    fno int,
+    userno varchar(100),
+    regDate DATE,
+    state varchar(20)
+);
+
+DROP TABLE application_FM;
 
 -- 파일심기
 INSERT INTO FLEAMARKET_FILES VALUES (
@@ -34,96 +42,62 @@ INSERT INTO FLEAMARKET_FILES VALUES (
 
 SELECT * from FLEAMARKET;
 SELECT * from FLEAMARKET_FILES;
+SELECT * from APPLICATION_FM;
 
+SELECT * FROM FLEAMARKET
+WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE CONCAT('%','대림','%');
+AND ADDRESS LIKE CONCAT('%','예시','%');
 
 
 DELETE FROM FLEAMARKET;
 DELETE FROM FLEAMARKET_FILES;
+DELETE FROM APPLICATION_FM;
 
 select max(FNO) from FLEAMARKET;
 -- 리스트조회용
 
-
+select date_format(sysdate(),'%Y-%m-%d') from FLEAMARKET;
 
 SELECT * FROM FLEAMARKET INNER JOIN (
         select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R) TMP
 GROUP BY FLEAMARKET.FNO;
 
-SELECT B.* FROM (
-) B WHERE ROWNUM=1;
+select max(fno) from FLEAMARKET;
 
 
-SELECT F.FNO,F.TITLE,F.ADDRESS,F.CURCNT,F.APPROVALCNT,F.REGDATE,F2.UUID_FILE_NAME FROM FLEAMARKET AS F
-    LEFT JOIN  (select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R) AS F2
-    ON F.FNO = F2.FNO;
-GROUP BY FNO;
+update FLEAMARKET set ENDDATE = '2023-08-28' where FNO = 58;
+
 
 -- 전체 게시글에 대해 파일 하나씩들고와서 출력
-SELECT F.FNO, F.TITLE, SUBSTRING_INDEX(F.ADDRESS, ' ', 3) as ADDRESS, F.CURCNT, F.APPROVALCNT, date_format(F.REGDATE,'%Y-%m-%d') REGDATE, MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
-FROM FLEAMARKET AS F
-         LEFT JOIN (
-    SELECT FILES.FNO, FILES.UUID_FILE_NAME
-    FROM FLEAMARKET_FILES FILES
-    ORDER BY FILES.UUID_FILE_NAME -- 원하는 정렬 순서를 지정할 수 있습니다.
-) AS F2 ON F.FNO = F2.FNO
-GROUP BY F.FNO
-ORDER BY F.REGDATE DESC;
-
 -- ROWNUM적용시켜서 출력
-SELECT
-    (@rownum := @rownum + 1) as ROWNUM,
-    F.FNO,
-    F.TITLE,
-    SUBSTRING_INDEX(F.ADDRESS, ' ', 3) as ADDRESS,
-    F.CURCNT,
-    F.APPROVALCNT,
-    date_format(F.REGDATE,'%Y-%m-%d') REGDATE,
-    MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
-FROM FLEAMARKET AS F
-         LEFT JOIN (
-    SELECT FILES.FNO, FILES.UUID_FILE_NAME
-    FROM FLEAMARKET_FILES FILES
-    ORDER BY FILES.UUID_FILE_NAME -- 원하는 정렬 순서를 지정할 수 있습니다.
-) AS F2 ON F.FNO = F2.FNO,
-     (SELECT @rownum := 0) r
-GROUP BY F.FNO
-HAVING ROWNUM BETWEEN 1 AND 6;
-
-
-
 SELECT
     (@rownum := @rownum + 1) as ROWNUM,
     F.*,
     MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
-    FROM (SELECT  FNO,
-              TITLE,
-              SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
-              CURCNT,
-              date_format(REGDATE,'%Y-%m-%d') REGDATE,
-              APPROVALCNT FROM FLEAMARKET
-      -- 검색조건문 구간
-      WHERE TITLE LIKE CONCAT('%','','%')
+FROM (SELECT FNO,
+             TITLE,
+             SUBSTRING_INDEX(ADDRESS, ' ', 3) AS ADDRESS,
+             CURCNT,
+             DATE_FORMAT(REGDATE, '%Y-%m-%d') AS REGDATE,
+             APPROVALCNT,
+             ENDDATE,
+             CASE WHEN STR_TO_DATE(ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
+                  ELSE '모집중'
+                 END AS STATE
+      FROM FLEAMARKET
+      WHERE CONCAT(TITLE, ADDRESS, DETAILADDRESS) LIKE CONCAT('%', '', '%')
+      ORDER BY REGDATE DESC, STR_TO_DATE(ENDDATE, '%Y-%m-%d') ASC
+          ) AS F LEFT JOIN (
+            SELECT FILES.FNO, FILES.UUID_FILE_NAME
+            FROM FLEAMARKET_FILES FILES
+            ORDER BY FILES.UUID_FILE_NAME
+        ) AS F2 ON F.FNO = F2.FNO,
+          (SELECT @rownum := 0) r
+      GROUP BY F.FNO
+      HAVING ROWNUM BETWEEN 1 and 6
+      ORDER BY ROWNUM;
 
-      ) AS F LEFT JOIN (
-    SELECT FILES.FNO, FILES.UUID_FILE_NAME
-    FROM FLEAMARKET_FILES FILES
-    ORDER BY FILES.UUID_FILE_NAME
-) AS F2 ON F.FNO = F2.FNO,
-     (SELECT @rownum := 0) r
-GROUP BY F.FNO
-HAVING ROWNUM BETWEEN 7 AND 12;
-
-SELECT  FNO,
-        TITLE,
-        SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
-        CURCNT,
-        date_format(REGDATE,'%Y-%m-%d') REGDATE,
-        APPROVALCNT FROM FLEAMARKET
-WHERE ADDRESS LIKE CONCAT('%','경기','%');
-
-
-select @ROWNUM:= @ROWNUM+1 AS ROWNUM,FILES.* from FLEAMARKET_FILES FILES,(SELECT @ROWNUM :=0) R GROUP BY FNO;
-
+-- main 게시글 리스트 조건문 입력하여 출력
 
 SELECT
     (@rownum := @rownum + 1) as ROWNUM,
@@ -134,6 +108,7 @@ FROM (SELECT  FNO,
               SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
               CURCNT,
               date_format(REGDATE,'%Y-%m-%d') REGDATE,
+              ENDDATE
               APPROVALCNT FROM FLEAMARKET
       -- 검색조건문 구간
       WHERE TITLE LIKE CONCAT('%','','%')
@@ -148,3 +123,37 @@ GROUP BY F.FNO
 HAVING ROWNUM BETWEEN 1 AND 6;
 
 
+-- 게시글 수정
+update FLEAMARKET SET
+         title = 'd',
+         content = 'd',
+         ADDRESS = 'd',
+         DETAILADDRESS = 'd',
+         APPROVALCNT = 50,
+         ENDDATE ='d',
+         UPTDATE = date_format(sysdate(),'%Y-%m-%d')
+where fno = 31;
+
+
+#신청중복검사
+SELECT  count(*) from APPLICATION_FM
+WHERE FNO = 10 AND userno = userno;
+
+# 신청하기
+INSERT INTO APPLICATION_FM VALUES (
+    0,FNO,userno,sysdate(),'대기'
+);
+
+#신청글 삭제(공통)
+DELETE FROM APPLICATION_FM WHERE FNO = #{fno,jdbcType=NUMERIC}
+
+
+SELECT  FNO,
+        TITLE,
+        SUBSTRING_INDEX(ADDRESS, ' ', 3) as ADDRESS,
+        CURCNT,
+        date_format(REGDATE,'%Y-%m-%d') REGDATE,
+        APPROVALCNT,ENDDATE FROM FLEAMARKET
+                                 -- 검색조건문 구간
+WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE  CONCAT('%','','%')
+ORDER BY REGDATE DESC,STR_TO_DATE(ENDDATE, '%Y-%m-%d') ASC;

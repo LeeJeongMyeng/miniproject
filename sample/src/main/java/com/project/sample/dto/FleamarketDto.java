@@ -18,10 +18,11 @@ public class FleamarketDto {
     private int approvalCnt; //최대승인수
     private int curCnt; //현재승인수
     private String endDate; //모집종료날짜
-    private Date regDate; //게시날짜
-    private Date uptDate; //수정날짜
+    private String regDate; //게시날짜
+    private String uptDate; //수정날짜
 
 
+    private String state;
 
     private String origin_file_name;
     private String uuid_file_name;

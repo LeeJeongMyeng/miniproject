@@ -10,14 +10,14 @@ import java.util.UUID;
 
 @Service
 public class FileService {
-
+    String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
+    // path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
 
     //고유ID Version
     public String Insprofileimg(MultipartFile file) {
         //집
-        //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
         //노트북
-        String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
+
         //고유 ID생성하는 내장 함수 ==> 중복파일 방지
         String uuid = UUID.randomUUID().toString();
         // 고유 ID+파일이름으로 심어줌
@@ -52,8 +52,9 @@ public class FileService {
 
     //파일 삭제처리
     public void DeleteFile(String filename) {
-        String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket";
+
         String filePath= path+filename;
+        System.out.println(filePath);
         File f = new File(filePath);
         if(f.exists()) {f.delete();}
     }

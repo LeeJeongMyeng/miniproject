@@ -1,10 +1,13 @@
 package com.project.sample.dao;
 
 
+import com.project.sample.dto.Application_FM;
 import com.project.sample.dto.FleamarketDto;
+import com.project.sample.dto.Fleamarket_Files;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface FleamarketDao {
@@ -12,6 +15,15 @@ public interface FleamarketDao {
     public int FleaMarket_get_fno_max();
     public void reg_FleaMarket_file(FleamarketDto fleamarketDto);
     public List<FleamarketDto> get_FleaMarket_List(FleamarketDto fleamarketDto);
-    public int get_FleaMarket_totCnt();
+    public int get_FleaMarket_totCnt(FleamarketDto fleamarketDto);
+    public FleamarketDto get_FleaMarket(int fno);
+    public List<Fleamarket_Files> get_FleaMarket_files(int fno);
+    public int del_FleaMarket(int fno);
+    public void del_FleaMarket_files(int fno);
+    public int upt_FleaMarket(FleamarketDto fleamarketDto);
+    public int application_FM(Map<String,Object> map);
+    public int Check_Application(Map<String,Object> map);
+    public void del_Application_FM(int fno);
+
 
 }

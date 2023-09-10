@@ -8,26 +8,18 @@
         select count(*) from ctg_member where email = #{email,jdbcType=VARCHAR}
     </select>
 
-
-    <select id="Check_SignUp_name" parameterType="Member" resultType="_int">
-        SELECT count(*) FROM CTG_MEMBER
-            where NAME = #{name,jdbcType=VARCHAR}
-            and PERSONALNUMBER = #{personalNumber,jdbcType=VARCHAR}
-    </select>
-
     <insert id="Ins_Ctg_Member" parameterType="Member" >
-        INSERT INTO CTG_MEMBER VALUES (
-        CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
+
+        INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
         #{email,jdbcType=VARCHAR},
         #{password,jdbcType=VARCHAR},
         #{name,jdbcType=VARCHAR},
-        #{personalNumber,jdbcType=VARCHAR},
         #{phoneNumber,jdbcType=VARCHAR},
         #{postcode,jdbcType=NUMERIC},
         #{address,jdbcType=NUMERIC},
         <choose>
-            <when test="extraAddress!=null"> #{extraAddress,jdbcType=NUMERIC},</when>
-            <otherwise>NULL,</otherwise>
+        <when test="extraAddress!=null"> #{extraAddress,jdbcType=NUMERIC},</when>
+        <otherwise>NULL,</otherwise>
         </choose>
         #{detailAddress,jdbcType=NUMERIC},
         #{bnCheck,jdbcType=NUMERIC},
@@ -48,4 +40,6 @@
         WHERE STATE = 1
           AND EMAIL = #{email,jdbcType=VARCHAR}
     </select>
+
+
 </mapper>

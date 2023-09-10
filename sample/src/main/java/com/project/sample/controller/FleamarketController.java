@@ -1,14 +1,13 @@
 package com.project.sample.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sample.dto.FleamarketDto;
 import com.project.sample.dto.Member;
 import com.project.sample.service.FleamarketService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
@@ -28,32 +27,73 @@ public class FleamarketController {
 
 
     @PostMapping("/ctg/reg_FleaMarket")
-    public int reg_FleaMarket(@RequestBody FleamarketDto fleamarketDto){
-        System.out.println("reg_FeaMarket_Controller");
-        //여기서 등록하고 바로 해당 게시글번호 뽑아옴
-        int success = service.reg_FleaMarket(fleamarketDto);
+    public int reg_FleaMarket(@RequestPart(value = "files", required = false) List<MultipartFile> files,
+                              @RequestParam("FleamarketDto") String fleamarketDtoStr,
+                              @RequestParam("method") String method) throws JsonProcessingException {
 
-        return success;
-    }
+        // JSON 형태를 객체로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        FleamarketDto fleamarketDto = objectMapper.readValue(fleamarketDtoStr, FleamarketDto.class);
 
-    @PostMapping("/ctg/reg_FleaMarket_files")
-    public int reg_FleaMarket_files(@RequestPart("files") List<MultipartFile> files){
+        // 등록 or 수정 후 fno 받아옴
+        int fno = service.reg_FleaMarket(fleamarketDto, method);
 
-        for(MultipartFile file:files){
-            System.out.println(file.getOriginalFilename());
+        System.out.println(files != null && !files.isEmpty());
+
+        // MultipartFile 데이터가 존재하는 경우에만 파일 등록을 실행
+        if (files != null && !files.isEmpty()) {
+            service.reg_FleaMarket_files(files, fno, method);
         }
-        return service.reg_FleaMarket_files(files);
+        return 0;
     }
-
+    // 메인화면 게시글 리스트+ 썸네일 사진 하나씩
     @PostMapping("/ctg/get_FleaMarket_List")
     public Map<String,Object> get_FleaMarket_List(@RequestBody FleamarketDto fleamarketDto){
         Map<String,Object> map = new HashMap<String,Object>();
-
+        System.out.println("get_FleaMarket_List");
         map.put("FleamarketList",service.get_FleaMarket_List(fleamarketDto));
 
         return map;
 //        return 0;
     }
+
+    //상세조회
+    @GetMapping("/ctg/get_FleaMarket")
+    public Map<String,Object> get_FleaMarket(@RequestParam int fno){
+        Map<String,Object> map = new HashMap<String,Object>();
+        System.out.println(fno);
+        //게시글정보
+       map.put("FleaMarket",service.get_FleaMarket(fno));
+       //게시글 이미지 사진정보
+       map.put("FleaMarket_files",service.get_FleaMarket_files(fno));
+
+        return map;
+    }
+    //게시글 삭제
+    @GetMapping("/ctg/del_FleaMarket")
+    public int del_FleaMarket(@RequestParam int fno){
+        System.out.println("삭제Con");
+        return service.del_FleaMarket(fno);
+    }
+
+    @GetMapping("/ctg/application_FM")
+    public int application_FM(@RequestParam int fno,@RequestParam String userno){
+        System.out.println("플리마켓 신청 실행");
+        int Successnum = 0;
+        //중복검사
+        int Checknum = service.Check_Application(fno,userno);
+        System.out.println(Checknum);
+        //신청 진행
+        if(Checknum==0){
+           Successnum =  service.application_FM(fno, userno);
+        }
+
+
+        return Successnum;
+    }
+
+
+
 
 
 }
