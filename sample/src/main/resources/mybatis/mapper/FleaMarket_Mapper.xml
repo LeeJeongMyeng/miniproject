@@ -71,21 +71,21 @@
 
 
     <select id="get_FleaMarket_totCnt" parameterType="FleamarketDto" resultType="_int">
-    SELECT COUNT(*) FROM FLEAMARKET
-    WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
+        SELECT COUNT(*) FROM FLEAMARKET
+        WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
     </select>
     <!-- 상세조회 게시글-->
     <select id="get_FleaMarket" parameterType="_int" resultType="FleamarketDto">
-    <![CDATA[
+        <![CDATA[
 
-    SELECT *,
-           CASE WHEN STR_TO_DATE(ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
-            ELSE '모집중'
-            END AS STATE
-    FROM FLEAMARKET
-    WHERE fno = #{fno,jdbcType=NUMERIC}
+        SELECT *,
+               CASE WHEN STR_TO_DATE(ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
+                ELSE '모집중'
+                END AS STATE
+        FROM FLEAMARKET
+        WHERE fno = #{fno,jdbcType=NUMERIC}
 
-    ]]>
+        ]]>
     </select>
 
     <select id="get_FleaMarket_files" parameterType="_int" resultType="Fleamarket_Files">
@@ -102,15 +102,15 @@
     </delete>
 
     <update id="upt_FleaMarket" parameterType="FleamarketDto">
-        update FLEAMARKET SET
-                              title = #{title,jdbcType=VARCHAR},
-                              content = #{content,jdbcType=VARCHAR},
-                              ADDRESS = #{address,jdbcType=VARCHAR},
-                              DETAILADDRESS = #{detailAddress,jdbcType=VARCHAR},
-                              APPROVALCNT = #{approvalCnt,jdbcType=NUMERIC},
-                              ENDDATE =date_format(#{endDate,jdbcType=VARCHAR},'%Y-%m-%d'),
-                              UPTDATE = date_format(sysdate(),'%Y-%m-%d')
-        where fno = #{fno,jdbcType=NUMERIC}
+        UPDATE FLEAMARKET
+        SET  title = #{title,jdbcType=VARCHAR},
+             content = #{content,jdbcType=VARCHAR},
+             ADDRESS = #{address,jdbcType=VARCHAR},
+             DETAILADDRESS = #{detailAddress,jdbcType=VARCHAR},
+             APPROVALCNT = #{approvalCnt,jdbcType=NUMERIC},
+             ENDDATE = date_format(#{endDate,jdbcType=VARCHAR},'%Y-%m-%d'),
+             UPTDATE = date_format(sysdate(),'%Y-%m-%d')
+        WHERE fno = #{fno,jdbcType=NUMERIC}
     </update>
 
     <insert id="application_FM" parameterType="HashMap">
@@ -122,13 +122,47 @@
             '대기'
         )
     </insert>
-
+     <!-- 중복신청 확인용 -->
     <select id="Check_Application" parameterType="HashMap" resultType="_int">
-        SELECT  count(*) from APPLICATION_FM
+        SELECT  count(*)
+        from APPLICATION_FM
         WHERE FNO = #{fno,jdbcType=NUMERIC} AND userno = #{userno,jdbcType=VARCHAR}
     </select>
-
+        <!-- 게시글 삭제시 신청글도 삭제 -->
     <delete id="del_Application_FM" parameterType="_int">
-        DELETE FROM APPLICATION_FM WHERE FNO = #{fno,jdbcType=NUMERIC}
+        DELETE
+        FROM APPLICATION_FM
+        WHERE FNO = #{fno,jdbcType=NUMERIC}
     </delete>
+
+<!--    특정 fno(글번호)에 대해 신청자(승인/대기/거절) 인원들고오기-->
+    <select id="get_application_FM" parameterType="Application_FM" resultType="Application_FM">
+        select AF.USERNO,AF.REGDATE,CM.NAME,CM.EMAIL,CM.ADDRESS,CM.PHONENUMBER
+        from APPLICATION_FM AS AF
+        INNER JOIN CTG_MEMBER AS CM ON AF.USERNO = CM.USERNO
+        WHERE AF.FNO = #{fno,jdbcType=NUMERIC} and AF.STATE = #{state,jdbcType=VARCHAR};
+    </select>
+
+    <!-- 신청한 회원의 상태값 변경(수락/거절/대기)   -->
+    <update id="upt_application_FM" parameterType="Application_FM">
+        update APPLICATION_FM SET
+            STATE = #{state,jdbcType=VARCHAR}
+        WHERE FNO = #{fno,jdbcType=NUMERIC}
+          AND USERNO = #{userno,jdbcType=VARCHAR}
+    </update>
+
+<!--    현재승인인원 수-->
+    <select id="get_Application_count" parameterType="_int">
+        SELECT COUNT(*) FROM APPLICATION_FM
+        WHERE FNO = #{fno,jdbcType=NUMERIC}
+          AND STATE = '승인'
+    </select>
+<!--    현재 특정글의 승인갯수 업데이트-->
+    <update id="upt_apl_FM_Count" parameterType="Application_FM">
+        UPDATE FLEAMARKET SET
+            CURCNT = #{count,jdbcType=NUMERIC}
+        WHERE FNO = #{fno,jdbcType=NUMERIC}
+    </update>
+
+
 </mapper>

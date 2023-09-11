@@ -198,9 +198,20 @@ ALTER TABLE ctg_notic_files change upload_file_name chg_source_filename varchar(
 
 
 DELETE FROM ctg_notic_files
-WHERE ntno = #{ntno,jdbcType=NUMERIC}
+WHERE ntno = #{ntno,jdbcType=NUMERIC};
 
 
+
+-- ===========================================================================================
+
+# 리스트 조회
+
+SELECT (@rownum := @rownum + 1) as ROWNUM,N.* FROM (
+    SELECT ntno,title,IMPWHETHER,REGDATE,UPTDATE,DELDATE FROM CTG_NOTIC
+    WHERE ctg_notic.TITLE LIKE CONCAT('%','','%')
+    ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r
+    HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
+    ORDER BY ROWNUM
 
 
 

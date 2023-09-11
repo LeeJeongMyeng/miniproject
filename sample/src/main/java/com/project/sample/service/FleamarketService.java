@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -21,4 +22,7 @@ public interface FleamarketService {
     public int del_FleaMarket(int fno);
     public int application_FM(int fno,String userno);
     public int Check_Application(int fno, String userno);
+    public Map<String,Object> get_application_FM(Application_FM applicationFm) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+    public int upt_application_FM(Application_FM applicationFm);
+    public int upt_apl_FM_ACount(Application_FM applicationFm);
 }

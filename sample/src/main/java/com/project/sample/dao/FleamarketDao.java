@@ -24,6 +24,9 @@ public interface FleamarketDao {
     public int application_FM(Map<String,Object> map);
     public int Check_Application(Map<String,Object> map);
     public void del_Application_FM(int fno);
-
+    public List<Application_FM> get_application_FM(Application_FM applicationFm);
+    public int upt_application_FM(Application_FM applicationFm);
+    public int get_Application_count(int fno);
+    public int upt_apl_FM_Count(Application_FM applicationFm);
 
 }

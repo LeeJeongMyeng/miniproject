@@ -50,6 +50,7 @@ public class MemberServiceImp implements MemberService {
 
         // 각 필드를 순회합니다.
         for (Field field : fields) {
+            //private혹은 projected 필드에 접근할 수 있도록 허용
             field.setAccessible(true);
             String fieldName = field.getName();
             // 해당 필드가 String 타입이거나 필드명이 email이 아닐경우
@@ -117,14 +118,11 @@ public class MemberServiceImp implements MemberService {
             //평문 pwd와 암호화 pwd비교
             String Origin_pwd = member.getPassword();
             String Hash_pwd = memberInfo.getPassword();
-            System.out.println(Hash_pwd);
             boolean pwdCheck = aes.checkBcrypt(Origin_pwd, Hash_pwd);
-            System.out.println(pwdCheck);
 
             //일치한다면 이름을 암호화 해제하고 재할당
             if(pwdCheck){
                 memberInfo.setName(aes.decrypt(memberInfo.getName()));
-                System.out.println(memberInfo.getName());
                 memberInfo.setPassword(null);
             }else{
                 memberInfo = null;

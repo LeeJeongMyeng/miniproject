@@ -3,6 +3,7 @@ package com.project.sample.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.sample.dto.Application_FM;
 import com.project.sample.dto.FleamarketDto;
 import com.project.sample.dto.Member;
 import com.project.sample.service.FleamarketService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +78,7 @@ public class FleamarketController {
         return service.del_FleaMarket(fno);
     }
 
+    //특정 플리마켓 게시글에 대해 신청하기
     @GetMapping("/ctg/application_FM")
     public int application_FM(@RequestParam int fno,@RequestParam String userno){
         System.out.println("플리마켓 신청 실행");
@@ -91,7 +94,32 @@ public class FleamarketController {
 
         return Successnum;
     }
+    //신청자(승인/거절/대기) 목록가져오기
+    @PostMapping("/ctg/get_application_FM")
+    public Map<String , Object> get_application_FM(@RequestBody Application_FM applicationFm) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        System.out.println("/ctg/get_application_FM");
+        //데이터 가져오기
+        return service.get_application_FM(applicationFm);
+    }
 
+    //승인/거절/대기로 업데이트
+    @PostMapping("/ctg/upt_application_FM")
+    public int upt_application_FM(@RequestBody Application_FM applicationFm) {
+        System.out.println("/ctg/upt_application_FM 실행");
+
+            //상태수정
+           int result = service.upt_application_FM(applicationFm);
+
+           if(result==1){
+               //승인인원 재할당
+               result =service.upt_apl_FM_ACount(applicationFm);
+           }
+
+        System.out.println("상태 업데이트:"+result);
+
+        //데이터 가져오기
+        return result;
+    }
 
 
 

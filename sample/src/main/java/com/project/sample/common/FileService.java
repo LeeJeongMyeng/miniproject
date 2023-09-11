@@ -1,4 +1,4 @@
-package com.project.sample.service;
+package com.project.sample.common;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,8 +10,8 @@ import java.util.UUID;
 
 @Service
 public class FileService {
-    String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
-    // path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
+    //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
+    String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
 
     //고유ID Version
     public String Insprofileimg(MultipartFile file) {

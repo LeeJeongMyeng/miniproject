@@ -157,3 +157,24 @@ SELECT  FNO,
                                  -- 검색조건문 구간
 WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE  CONCAT('%','','%')
 ORDER BY REGDATE DESC,STR_TO_DATE(ENDDATE, '%Y-%m-%d') ASC;
+
+
+# 특정 글 신청자 상태에 맞게 들고오기
+select AF.USERNO,AF.REGDATE,CM.NAME,CM.EMAIL,CM.ADDRESS,CM.PHONENUMBER from APPLICATION_FM AS AF
+         INNER JOIN CTG_MEMBER AS CM ON AF.USERNO = CM.USERNO
+WHERE AF.FNO = 59 and AF.STATE = '대기';
+
+select name,email,address,phoneNumber FROM CTG_MEMBER
+WHERE USERNO = (select USERNO from APPLICATION_FM
+                WHERE FNO = 59 and STATE = '대기');
+
+update APPLICATION_FM SET
+        STATE = '대기'
+WHERE FNO = 59
+AND USERNO = 20230202;
+
+
+update FLEAMARKET SET
+        CURCNT = (SELECT COUNT(*) FROM APPLICATION_FM
+                  WHERE FNO = #{fno,jdbcType=NUMERIC}
+                    AND STATE = '승인');

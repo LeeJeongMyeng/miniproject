@@ -1,5 +1,7 @@
 package com.project.sample.service;
 
+import com.project.sample.common.AESImp;
+import com.project.sample.common.FileService;
 import com.project.sample.dao.FleamarketDao;
 import com.project.sample.dao.MemberDao;
 import com.project.sample.dto.*;
@@ -7,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,11 +22,13 @@ public class FleamarketServiceImp implements FleamarketService {
     private final FleamarketDao fleamarketDao;
     private final MemberDao memberDao;
     private FileService fileservice;
+    private final AESImp aes;
     @Autowired
-    public FleamarketServiceImp(FleamarketDao fleamarketDao, FileService fileservice, MemberDao memberDao) {
+    public FleamarketServiceImp(FleamarketDao fleamarketDao, FileService fileservice, MemberDao memberDao, AESImp aes) {
         this.fleamarketDao = fleamarketDao;
         this.fileservice=fileservice;
         this.memberDao=memberDao;
+        this.aes = aes;
     }
 
     //게시글 등록 -> 해당 게시글 번호 들고 복귀
@@ -137,6 +144,91 @@ public class FleamarketServiceImp implements FleamarketService {
 
 
         return fleamarketDao.Check_Application(map);
+    }
+
+    @Override
+    public Map<String,Object> get_application_FM(Application_FM applicationFm) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Map<String , Object> map = new HashMap<>();
+
+        //각 상태에 대한 할당
+        String[] states = {"대기","승인","거절"};
+        String[] states_mapname = {"wait","approval","reject"};
+        
+        //데이터 가져오기
+        for(int i=0; i<states.length;i++){
+            applicationFm.setState(states[i]);
+            List<Application_FM> applicationFmList = fleamarketDao.get_application_FM(applicationFm);
+
+            //복호화처리
+            for(Application_FM a:applicationFmList){
+                // 필드명을 가져옴  맨앞글자 대문자+맨앞글자제외문자 => Name,Eamil
+                Field[] fields = a.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    //private혹은 projected 필드에 접근할 수 있도록 허용
+                    field.setAccessible(true);
+                    String fieldName = field.getName();
+                    //복호화가 필요없는 컬럼이 아닐경우
+                    if(fieldName.equals("name") || fieldName.equals("address") || fieldName.equals("phoneNumber")){
+                        //set/get을 위해 field이름의 앞글자를 대문자로 전환
+                        String methodName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                        // 현재 필드의 get+methodName으로 getter호출
+                        Method getter = a.getClass().getMethod("get" + methodName);
+                        // 현재 필드의 setter 호출
+                        Method setter = a.getClass().getMethod("set" + methodName, String.class);
+                        String Originvalue;
+                        // getter로 호출하여 현재 문자열 필드의 암호화값을 얻음
+                        String EncValue = (String) getter.invoke(a);
+
+                        Originvalue = aes.decrypt(EncValue);
+
+                        setter.invoke(a,Originvalue);
+                    }
+                }
+                String methodName = a.getName().substring(0, 1).toUpperCase() + a.getName().substring(1);
+
+            }
+
+            //개인정보 일부 가리기
+
+            //applicationFm.setName(aes.ProtectName(applicationFm.getName()));
+
+            for(Application_FM a:applicationFmList){
+                //이름 별처리
+               a.setName(aes.ProtectName(a.getName()));
+               //이메일 별처리
+                a.setEmail(aes.ProtectEmail(a.getEmail()));
+               //폰번 별처리
+                a.setPhoneNumber(aes.ProtectPhoneNumber(a.getPhoneNumber()));
+               //주소 구까지 처리
+                a.setAddress(aes.Protectaddress(a.getAddress()));
+            }
+
+
+            map.put(states_mapname[i]+"_appliication_FM",applicationFmList);
+        }
+
+        return map;
+    }
+    //승인/대기/거부시 업데이트
+    @Override
+    public int upt_application_FM(Application_FM applicationFm) {
+
+        System.out.println("상태 수정될 게시글번호:"+applicationFm.getFno());
+        System.out.println("상태 수정될 상태값:"+applicationFm.getState());
+        System.out.println("상태 수정될 유저번호:"+applicationFm.getUserno());
+
+        return fleamarketDao.upt_application_FM(applicationFm);
+    }
+    //상태 업데이트 이후, 해당 게시글의 승인갯수 업데이트
+    @Override
+    public int upt_apl_FM_ACount(Application_FM applicationFm) {
+
+        //현재 승인처리된 갯수불러오기
+        int count = fleamarketDao.get_Application_count(applicationFm.getFno());
+        applicationFm.setCount(count);
+        //해당 게시글의 승인 갯수 업데이트
+        fleamarketDao.upt_apl_FM_Count(applicationFm);
+        return count;
     }
 
     //파일 삭제처리 공통 메서드
