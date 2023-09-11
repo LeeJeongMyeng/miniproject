@@ -204,13 +204,18 @@ WHERE ntno = #{ntno,jdbcType=NUMERIC};
 
 -- ===========================================================================================
 
+SELECT NTNO,TITLE,CONTENT,IMPWHETHER,REGDATE from CTG_NOTIC where ntno = 53;
+
+select * from CTG_NOTIC_FILES WHERE ntno = 53;
+
+
 # 리스트 조회
 
 SELECT (@rownum := @rownum + 1) as ROWNUM,N.* FROM (
     SELECT ntno,title,IMPWHETHER,REGDATE,UPTDATE,DELDATE FROM CTG_NOTIC
     WHERE ctg_notic.TITLE LIKE CONCAT('%','','%')
     ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r
-    HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
+    HAVING ROWNUM BETWEEN 3 and 3
     ORDER BY ROWNUM
 
 

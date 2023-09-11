@@ -9,4 +9,6 @@ import java.util.List;
 public interface NoticDao {
     public int get_Notic_Count(Notic notic);
     public List<Notic> get_Notic_List(Notic notic);
+    public Notic get_Notic(int ntno);
+    public List<Notic> get_Notic_files(int ntno);
 }

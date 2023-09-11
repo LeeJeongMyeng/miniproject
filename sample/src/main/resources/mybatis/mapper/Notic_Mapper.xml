@@ -24,25 +24,52 @@
     <!-- 공지사항 리스트 select -->
     <select id="get_Notic_List" parameterType="Notic" resultType="Notic">
 
-        SELECT (@rownum := @rownum + 1) as ROWNUM,N.* FROM (
-        SELECT ntno,title,IMPWHETHER,REGDATE,UPTDATE,DELDATE FROM CTG_NOTIC
-        WHERE
-        <choose>
-            <when test="Search_Mode == 3"> <!-- 내용만검색 -->
-                CONTENT
-            </when>
-            <when test="Search_Mode == 2"> <!-- 제목만검색 -->
-                TITLE
-            </when>
-            <otherwise>
-                CONCAT(TITLE,CONTENT) <!-- 전체검색 -->
-            </otherwise>
-        </choose>
-        LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
-        ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
+        SELECT
+            (@rownum := @rownum + 1) as ROWNUM,N.*
+        FROM (
+            SELECT
+                ntno,
+                title,
+                IMPWHETHER,
+                REGDATE,
+                UPTDATE,
+                DELDATE
+            FROM CTG_NOTIC
+            WHERE
+            <choose>
+                <when test="Search_Mode == 3"> <!-- 내용만검색 -->
+                    CONTENT
+                </when>
+                <when test="Search_Mode == 2"> <!-- 제목만검색 -->
+                    TITLE
+                </when>
+                <otherwise>
+                    CONCAT(TITLE,CONTENT) <!-- 전체검색 -->
+                </otherwise>
+            </choose>
+            LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
+            AND NOTICSTATE = 1
+            ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
         HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
         ORDER BY ROWNUM
     </select>
 
+    <select id="get_Notic" parameterType="_int" resultType="Notic">
+        SELECT
+            NTNO,
+            TITLE,
+            CONTENT,
+            IMPWHETHER,
+            REGDATE
+        from CTG_NOTIC
+        where ntno = 53;
+    </select>
+
+    <select id="get_Notic_files" parameterType="_int" resultType="Notic">
+        select
+            *
+        from CTG_NOTIC_FILES
+        WHERE ntno = 53;
+    </select>
 
 </mapper>
