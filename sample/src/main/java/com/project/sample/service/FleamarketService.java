@@ -25,4 +25,6 @@ public interface FleamarketService {
     public Map<String,Object> get_application_FM(Application_FM applicationFm) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
     public int upt_application_FM(Application_FM applicationFm);
     public int upt_apl_FM_ACount(Application_FM applicationFm);
+    public FleaMarketDto2 get_My_FleaMarket(FleamarketDto fleamarketDto);
+    public FleaMarketDto2 get_My_Application(FleamarketDto fleamarketDto);
 }

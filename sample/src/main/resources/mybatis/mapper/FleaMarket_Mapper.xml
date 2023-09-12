@@ -159,10 +159,80 @@
     </select>
 <!--    현재 특정글의 승인갯수 업데이트-->
     <update id="upt_apl_FM_Count" parameterType="Application_FM">
-        UPDATE FLEAMARKET SET
+        UPDATE
+            FLEAMARKET
+        SET
             CURCNT = #{count,jdbcType=NUMERIC}
-        WHERE FNO = #{fno,jdbcType=NUMERIC}
+        WHERE
+            FNO = #{fno,jdbcType=NUMERIC}
     </update>
 
+    <!-- 내가 쓴 플리마켓 갯수 -->
+    <select id="get_My_FleaMarket_Count" parameterType="FleamarketDto" resultType="_int">
+        SELECT
+            COUNT(*)
+        FROM
+            FLEAMARKET
+        WHERE
+            USERNO = #{userno,jdbcType=VARCHAR}
+    </select>
 
+<!--내가 쓴 플리마켓글 조회-->
+    <select id="get_My_FleaMarket" parameterType="FleamarketDto" resultType="FleamarketDto">
+
+        SELECT * FROM (
+                  SELECT
+                      (@rownum := @rownum + 1) as ROWNUM, F.*
+                  FROM
+                      (SELECT @rownum := 0) r, FLEAMARKET AS F
+                  WHERE
+                      F.USERNO = #{userno,jdbcType=VARCHAR}
+                  ORDER BY
+                      FNO
+              ) AS T
+        WHERE
+            ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
+    </select>
+    <!-- 내가 신청한 글 갯수 -->
+    <select id="get_My_Application_Count" parameterType="FleamarketDto" resultType="_int">
+        SELECT
+            COUNT(*)
+        FROM
+            APPLICATION_FM
+        WHERE USERNO = #{userno,jdbcType=VARCHAR}
+    </select>
+
+    <select id="get_My_Application" parameterType="FleamarketDto" resultType="FleamarketDto">
+        <![CDATA[
+        SELECT * from
+            (SELECT
+                 (@rownum := @rownum + 1) as ROWNUM,T.*
+             FROM
+               (SELECT
+                    F.FNO,
+                    F.TITLE,
+                    F.ADDRESS,
+                    F.CURCNT,
+                    F.APPROVALCNT,
+                    A.STATE,
+                    CASE WHEN
+                         STR_TO_DATE(F.ENDDATE, '%Y-%m-%d') < CURDATE()
+                     THEN '모집종료'
+                     ELSE '모집중'
+                     END AS FSTATE
+                 FROM
+                    APPLICATION_FM AS A
+                 INNER JOIN
+                    FLEAMARKET F
+                 ON
+                    A.FNO = F.FNO
+                 WHERE
+                    A.USERNO = #{userno,jdbcType=VARCHAR}
+                 ORder by
+                     FNO
+                 ) AS T,
+            (SELECT @ROWNUM:=0) r) AS a
+        where rownum BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
+        ]]>
+    </select>
 </mapper>

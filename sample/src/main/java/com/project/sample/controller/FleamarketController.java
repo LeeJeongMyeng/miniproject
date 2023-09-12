@@ -2,8 +2,10 @@ package com.project.sample.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sample.dto.Application_FM;
+import com.project.sample.dto.FleaMarketDto2;
 import com.project.sample.dto.FleamarketDto;
 import com.project.sample.dto.Member;
 import com.project.sample.service.FleamarketService;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +123,19 @@ public class FleamarketController {
         //데이터 가져오기
         return result;
     }
+    //내가 쓴 플리마켓 조회
+    @PostMapping("/ctg/get_My_FleaMarket")
+    public FleaMarketDto2 get_My_FleaMarket(@RequestBody FleamarketDto fleamarketDto){
+        ObjectMapper objectMapper = new ObjectMapper();
 
+        return service.get_My_FleaMarket(fleamarketDto);
+    }
+    //내가 신청한 글 조회
+    @PostMapping("/ctg/get_My_Application")
+    public FleaMarketDto2 get_My_Application(@RequestBody FleamarketDto fleamarketDto){
+
+        return service.get_My_Application(fleamarketDto);
+    }
 
 
 

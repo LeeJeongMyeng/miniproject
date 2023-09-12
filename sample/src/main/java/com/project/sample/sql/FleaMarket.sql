@@ -179,6 +179,58 @@ update FLEAMARKET SET
                   WHERE FNO = #{fno,jdbcType=NUMERIC}
                     AND STATE = '승인');
 
+-- 내가 쓴 플리마켓 게시글
+SELECT * FROM (
+SELECT (@rownum := @rownum + 1) as ROWNUM, F.*
+FROM (SELECT @rownum := 0) r, FLEAMARKET AS F
+WHERE F.USERNO = 2023091025) AS T
+WHERE ROWNUM BETWEEN 1 AND 3;
 
-SELECT *
-FROM CTG_NOTIC;
+SELECT * FROM (
+                  SELECT (@rownum := @rownum + 1) as ROWNUM, F.*
+                  FROM (SELECT @rownum := 0) r, FLEAMARKET AS F
+                  WHERE F.USERNO = 2023091025
+                  ORDER BY FNO
+              ) AS T
+WHERE ROWNUM BETWEEN 3 AND 4;
+
+SELECT (@rownum := @rownum + 1) as ROWNUM, F.*
+FROM (SELECT @rownum := 0) r, FLEAMARKET AS F
+WHERE F.USERNO = 2023091025
+ORDER BY FNO;
+-- 내가 신청한 플리마켓
+SELECT F.FNO,F.TITLE,F.ADDRESS,F.CURCNT,F.APPROVALCNT,A.STATE,CASE WHEN STR_TO_DATE(F.ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
+                                                                   ELSE '모집중'
+    END AS FSTATE FROM APPLICATION_FM AS A INNER JOIN FLEAMARKET F ON A.FNO = F.FNO
+WHERE F.USERNO=2023091025;
+
+SELECT * from
+(SELECT (@rownum := @rownum + 1) as ROWNUM,T.* FROM
+(SELECT
+    F.FNO,
+    F.TITLE,
+    F.ADDRESS,
+    F.CURCNT,
+    F.APPROVALCNT,
+    A.STATE,
+    CASE WHEN
+            STR_TO_DATE(F.ENDDATE, '%Y-%m-%d') < CURDATE()
+             THEN '모집종료'
+            ELSE '모집중'
+            END AS FSTATE
+FROM
+    APPLICATION_FM AS A
+        INNER JOIN
+    FLEAMARKET F
+    ON
+            A.FNO = F.FNO
+WHERE
+        A.USERNO = 2023091025
+ORder by FNO) AS T,(SELECT @ROWNUM:=0) r) AS a
+where rownum BETWEEN 1 and 2;
+
+SELECT
+    *
+FROM
+    APPLICATION_FM;
+WHERE USERNO = 2023091025;

@@ -23,6 +23,7 @@ public class FleamarketDto {
 
 
     private String state;
+    private String fstate;
 
     private String origin_file_name;
     private String uuid_file_name;

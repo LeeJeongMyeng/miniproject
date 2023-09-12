@@ -231,6 +231,66 @@ public class FleamarketServiceImp implements FleamarketService {
         return count;
     }
 
+
+    @Override
+    public FleaMarketDto2 get_My_FleaMarket(FleamarketDto fleamarketDto){
+
+        FleaMarketDto2 fleaMarketDto2 = new FleaMarketDto2();
+
+        int currentPage = fleamarketDto.getCurrentPage(); //현재 페이지
+        System.out.println("현재페이지:"+currentPage);
+        System.out.println("검색단어:"+fleamarketDto.getTitle());
+        int totCnt = fleamarketDao.get_My_FleaMarket_Count(fleamarketDto); //게시글 전체 갯수
+        int onePageCnt = 10; //한 페이지 보여질 갯수
+        int totPage = (int)Math.ceil((double)totCnt/onePageCnt); //총 페이지 갯수
+        int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
+        int en_rownum = currentPage * onePageCnt; //끝 rownum
+        System.out.println("get_FleaMarket_List");
+        //검색 내용 및 페이지에 맞는 게시글 들고와서 담기
+        fleamarketDto.setSt_rownum(st_rownum);
+        System.out.println("현재페이지:"+st_rownum);
+        fleamarketDto.setEn_rownum(en_rownum);
+        System.out.println("현재페이지:"+en_rownum);
+
+
+        fleaMarketDto2.setFleamarketDtoList(fleamarketDao.get_My_FleaMarket(fleamarketDto));
+
+        fleaMarketDto2.setCurrentPage(currentPage);
+        fleaMarketDto2.setTotPage(totPage);
+        fleaMarketDto2.setOnePageCnt(onePageCnt);
+
+        return fleaMarketDto2;
+    }
+    @Override
+    public FleaMarketDto2 get_My_Application(FleamarketDto fleamarketDto){
+
+        FleaMarketDto2 fleaMarketDto2 = new FleaMarketDto2();
+
+        int currentPage = fleamarketDto.getCurrentPage(); //현재 페이지
+        System.out.println("Application:현재페이지:"+currentPage);
+        int totCnt = fleamarketDao.get_My_Application_Count(fleamarketDto); //게시글 전체 갯수
+        System.out.println("Application 전체페이지"+totCnt);
+        int onePageCnt = 2; //한 페이지 보여질 갯수
+        int totPage = (int)Math.ceil((double)totCnt/onePageCnt); //총 페이지 갯수
+        int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
+        int en_rownum = currentPage * onePageCnt; //끝 rownum
+        System.out.println("get_FleaMarket_List");
+        //검색 내용 및 페이지에 맞는 게시글 들고와서 담기
+        fleamarketDto.setSt_rownum(st_rownum);
+        System.out.println("현재페이지:"+st_rownum);
+        fleamarketDto.setEn_rownum(en_rownum);
+        System.out.println("현재페이지:"+en_rownum);
+
+        fleaMarketDto2.setFleamarketDtoList(fleamarketDao.get_My_Application(fleamarketDto));
+
+        fleaMarketDto2.setCurrentPage(currentPage);
+        fleaMarketDto2.setTotPage(totPage);
+        fleaMarketDto2.setOnePageCnt(onePageCnt);
+
+        return fleaMarketDto2;
+    }
+
+//=======================================================================================
     //파일 삭제처리 공통 메서드
     public void del_Fleamarket_Files(int fno){
         //파일 리스트 부터 뽑아옴
@@ -242,6 +302,5 @@ public class FleamarketServiceImp implements FleamarketService {
 
         fleamarketDao.del_FleaMarket_files(fno);
     }
-
 
 }
