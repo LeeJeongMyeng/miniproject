@@ -178,3 +178,7 @@ update FLEAMARKET SET
         CURCNT = (SELECT COUNT(*) FROM APPLICATION_FM
                   WHERE FNO = #{fno,jdbcType=NUMERIC}
                     AND STATE = '승인');
+
+
+SELECT *
+FROM CTG_NOTIC;

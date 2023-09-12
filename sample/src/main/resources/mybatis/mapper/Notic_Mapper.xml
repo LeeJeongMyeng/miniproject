@@ -62,14 +62,14 @@
             IMPWHETHER,
             REGDATE
         from CTG_NOTIC
-        where ntno = 53;
+        where ntno =#{ntno,jdbcType=NUMERIC};
     </select>
 
     <select id="get_Notic_files" parameterType="_int" resultType="Notic">
         select
             *
         from CTG_NOTIC_FILES
-        WHERE ntno = 53;
+        WHERE ntno = #{ntno,jdbcType=NUMERIC};
     </select>
 
 </mapper>

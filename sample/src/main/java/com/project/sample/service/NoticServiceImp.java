@@ -41,9 +41,15 @@ public class NoticServiceImp implements NoticService {
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
         int en_rownum = currentPage * onePageCnt; //끝 rownum
 
+        System.out.println("시작 rownum"+st_rownum);
+        System.out.println("끝 rownum"+en_rownum);
+
         notic.setSt_rownum(st_rownum);
         notic.setEn_rownum(en_rownum);
         notic2.setNoticList(noticDao.get_Notic_List(notic));
+        for(Notic n:notic2.getNoticList()){
+            System.out.println(n.getNtno());
+        }
         notic2.setCurrentPage(currentPage);
         notic2.setTotPage(totPage);
         notic2.setOnePageCnt(onePageCnt);

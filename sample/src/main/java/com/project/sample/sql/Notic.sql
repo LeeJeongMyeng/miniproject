@@ -220,6 +220,24 @@ SELECT (@rownum := @rownum + 1) as ROWNUM,N.* FROM (
 
 
 
+SELECT
+    (@rownum := @rownum + 1) as ROWNUM,N.*
+FROM (
+         SELECT
+             ntno,
+             title,
+             IMPWHETHER,
+             REGDATE,
+             UPTDATE,
+             DELDATE
+         FROM CTG_NOTIC
+         WHERE
+             CONTENT LIKE CONCAT('%','','%')
+           AND NOTICSTATE = 1
+             ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r
+         HAVING ROWNUM BETWEEN 2 and 2
+         ORDER BY ROWNUM
+
 
 
 

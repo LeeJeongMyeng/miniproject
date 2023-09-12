@@ -32,7 +32,8 @@ public class NoticController {
 
     @GetMapping("/ctg/get_Notic")
     public Map<String, Object> get_Notic(@RequestParam int ntno){
-        System.out.println("실행된 메서드 : /ctg/get_Notic_List");
+        System.out.println("실행된 메서드 : /ctg/get_Notic");
+        System.out.println(ntno);
         return service.get_Notic(ntno);
     }
 
