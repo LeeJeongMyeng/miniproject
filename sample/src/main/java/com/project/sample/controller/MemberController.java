@@ -60,10 +60,10 @@ public class MemberController {
 
     //회원가입
     @PostMapping("/ctg/Ins_Ctg_Member")
-    public Map<String, Integer> Ins_Ctg_Member(@RequestBody Member member) throws IllegalAccessException {
+    public int Ins_Ctg_Member(@RequestBody Member member) throws IllegalAccessException {
         Map<String, Integer> map = new HashMap<String, Integer>();
-        map.put("checkNum", service.Ins_Ctg_Member(member));
-        return map;
+        //map.put("checkNum", service.Ins_Ctg_Member(member));
+        return service.Ins_Ctg_Member(member);
     }
 
     //로그인

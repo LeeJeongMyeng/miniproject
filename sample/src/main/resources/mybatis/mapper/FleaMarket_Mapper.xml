@@ -54,7 +54,7 @@
                       FROM FLEAMARKET
                             -- 조건절
                       WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE  CONCAT('%',#{title,jdbcType=VARCHAR},'%')
-                      ORDER BY REGDATE DESC,STR_TO_DATE(ENDDATE, '%Y-%m-%d') ASC
+                      ORDER BY FNO DESC
 
              ) AS F LEFT JOIN (
             SELECT FILES.FNO, FILES.UUID_FILE_NAME

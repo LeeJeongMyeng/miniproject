@@ -5,41 +5,48 @@
 
 <mapper namespace="com.project.sample.dao.MemberDao">
     <select id="Check_SignUp_email" resultType="_int">
-        select count(*) from ctg_member where email = #{email,jdbcType=VARCHAR}
+        SELECT COUNT(*) FROM CTG_MEMBER WHERE EMAIL = #{email,jdbcType=VARCHAR}
     </select>
 
     <insert id="Ins_Ctg_Member" parameterType="Member" >
 
-        INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
-        #{email,jdbcType=VARCHAR},
-        #{password,jdbcType=VARCHAR},
-        #{name,jdbcType=VARCHAR},
-        #{phoneNumber,jdbcType=VARCHAR},
-        #{postcode,jdbcType=NUMERIC},
-        #{address,jdbcType=NUMERIC},
-        <choose>
-        <when test="extraAddress!=null"> #{extraAddress,jdbcType=NUMERIC},</when>
-        <otherwise>NULL,</otherwise>
-        </choose>
-        #{detailAddress,jdbcType=NUMERIC},
-        #{bnCheck,jdbcType=NUMERIC},
-        TRUE,
-        SYSDATE(),
-        NULL
+        INSERT INTO
+            CTG_MEMBER
+        VALUES
+            (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),NEXTVAL('seq_member')),
+            #{email,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{phoneNumber,jdbcType=VARCHAR},
+            #{postcode,jdbcType=NUMERIC},
+            #{address,jdbcType=NUMERIC},
+            <choose>
+                <when test="extraAddress!=null"> #{extraAddress,jdbcType=NUMERIC},</when>
+                <otherwise>NULL,</otherwise>
+            </choose>
+            #{detailAddress,jdbcType=NUMERIC},
+            #{bnCheck,jdbcType=NUMERIC},
+            TRUE,
+            SYSDATE(),
+            NULL
         );
     </insert>
 <!--  로그인 시, 정보  -->
     <select id="SignIn_Ctg_Member" parameterType="Member" resultType="Member">
-        SELECT USERNO,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
-        WHERE STATE = 1
-        AND EMAIL = #{email,jdbcType=VARCHAR}
+        SELECT
+            USERNO,
+            NAME,
+            EMAIL,
+            PASSWORD,
+            BNCHECK
+        FROM
+            CTG_MEMBER
+        WHERE
+            STATE = 1
+        AND
+            EMAIL = #{email,jdbcType=VARCHAR}
     </select>
 
-    <select id="SignIn_Ctg_Email" parameterType="String" resultType="Member">
-        SELECT USERNO,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
-        WHERE STATE = 1
-          AND EMAIL = #{email,jdbcType=VARCHAR}
-    </select>
 
 
 </mapper>

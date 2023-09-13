@@ -37,4 +37,6 @@ public class NoticController {
         return service.get_Notic(ntno);
     }
 
+
+
 }

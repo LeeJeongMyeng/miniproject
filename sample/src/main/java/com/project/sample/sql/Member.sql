@@ -19,6 +19,8 @@ create table ctg_user_bs(
     bnNumber varchar(100)
 );
 
+
+
 drop TABLE ctg_Member;
 
 create table sequences
@@ -73,7 +75,7 @@ INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('s
 
 SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')) FROM DUAL;
 
-DELETE FROM CTG_MEMBER WHERE USERNO = 2023090520;
+DELETE FROM CTG_MEMBER;
 
 COMMIT ;
 
@@ -90,4 +92,6 @@ SELECT USERNO,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
 WHERE STATE = 1
   AND EMAIL = 'z@nate.com';
 
-SELECT * FROM CTG_MEMBER;
+SELECT * FROM FLEAMARKET;
+
+update FLEAMARKET set CURCNT = 200 WHERE FNO = 78;

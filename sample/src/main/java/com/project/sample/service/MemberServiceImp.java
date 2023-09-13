@@ -18,14 +18,12 @@ import java.util.Map;
 public class MemberServiceImp implements MemberService {
 
     private final MemberDao dao;
-    private final AESImp aes;
+    private final AESImp aes; //암호화
     @Autowired
     public MemberServiceImp(MemberDao dao,AESImp aes) {
         this.dao = dao;
         this.aes = aes;
     }
-
-
 
     //이메일 중복검사
     @Override
@@ -54,7 +52,7 @@ public class MemberServiceImp implements MemberService {
             field.setAccessible(true);
             String fieldName = field.getName();
             // 해당 필드가 String 타입이거나 필드명이 email이 아닐경우
-            if (field.getType().equals(String.class) && !fieldName.equals("email")) {
+            if (field.getType().equals(String.class)) {
                 try {
                     // 필드명을 가져옴  맨앞글자 대문자+맨앞글자제외문자 => Name,Eamil
                     String methodName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
@@ -105,12 +103,16 @@ public class MemberServiceImp implements MemberService {
         //return 0;
     }
 
+    //로그인
     @Override
     public Member SignIn_Ctg_Member(Member member) {
 
         System.out.println("LOGIN EMAIL : "+member.getEmail());
         System.out.println("LOGIN PWD : "+member.getPassword());
-        //이메일 기준으로 회원정보 뽑아옴
+
+
+        member.setEmail(aes.encrypt(member.getEmail()));
+
         Member memberInfo = dao.SignIn_Ctg_Member(member);
 
         //회원 정보가 존재할경우
@@ -120,24 +122,22 @@ public class MemberServiceImp implements MemberService {
             String Hash_pwd = memberInfo.getPassword();
             boolean pwdCheck = aes.checkBcrypt(Origin_pwd, Hash_pwd);
 
-            //일치한다면 이름을 암호화 해제하고 재할당
+            //일치한다면 이름/이메일 복호화하고 재할당
             if(pwdCheck){
                 memberInfo.setName(aes.decrypt(memberInfo.getName()));
+                memberInfo.setEmail(aes.decrypt(memberInfo.getEmail()));
                 memberInfo.setPassword(null);
             }else{
                 memberInfo = null;
             }
+        }else{
+            memberInfo = null;
         }
 
         return memberInfo;
     }
 
-    @Override
-    public Member SignIn_Ctg_Email(String email) {
 
-        return dao.SignIn_Ctg_Email(email);
-    }
-    //email만받을 경우 조회
 
 
 

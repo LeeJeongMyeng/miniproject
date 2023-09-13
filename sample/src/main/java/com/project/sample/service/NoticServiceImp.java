@@ -35,7 +35,7 @@ public class NoticServiceImp implements NoticService {
         System.out.println("검색된 공지사항 갯수:"+totCnt);
 
         int currentPage = notic.getCurrentPage(); //현재 페이지
-        int onePageCnt = 1; //한 페이지 보여질 갯수
+        int onePageCnt = 10; //한 페이지 보여질 갯수
         System.out.println("현재페이지:"+currentPage);
         int totPage = (int)Math.ceil((double)totCnt/onePageCnt);
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
