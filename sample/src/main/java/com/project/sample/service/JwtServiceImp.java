@@ -18,6 +18,7 @@ public class JwtServiceImp implements JwtService{
     @Value("secretkey")
     private String secretkey;
 
+    //토큰 생성
     @Override
     public String getToken(String key, Object value) {
 
@@ -46,6 +47,7 @@ public class JwtServiceImp implements JwtService{
         return builder.compact();
     }
 
+    //Claims 생성
     @Override
     public Claims getClaims(String token) {
         if(token !=null && !"".equals(token)){

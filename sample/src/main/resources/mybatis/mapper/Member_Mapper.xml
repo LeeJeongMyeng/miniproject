@@ -4,10 +4,26 @@
 
 
 <mapper namespace="com.project.sample.dao.MemberDao">
-    <select id="Check_SignUp_email" resultType="_int">
-        SELECT COUNT(*) FROM CTG_MEMBER WHERE EMAIL = #{email,jdbcType=VARCHAR}
+<!--    이메일 중복검사-->
+    <select id="Check_SignUp_email" parameterType="Member" resultType="_int">
+        SELECT
+            COUNT(*)
+        FROM
+            CTG_MEMBER
+        WHERE
+            EMAIL = #{email,jdbcType=VARCHAR}
+    </select>
+<!--사업자번호 중복검사-->
+    <select id="BN_Check" parameterType="Member" resultType="_int">
+        SELECT
+            COUNT(*)
+        FROM
+            CTG_MEMBER
+        WHERE
+            B_NO = #{b_no,jdbcType=VARCHAR}
     </select>
 
+<!--    회원가입 -->
     <insert id="Ins_Ctg_Member" parameterType="Member" >
 
         INSERT INTO
@@ -28,9 +44,19 @@
             #{bnCheck,jdbcType=NUMERIC},
             TRUE,
             SYSDATE(),
-            NULL
+            NULL,
+            <choose>
+                <when test="bnCheck == true">
+                    #{b_no,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>
+
         );
     </insert>
+
 <!--  로그인 시, 정보  -->
     <select id="SignIn_Ctg_Member" parameterType="Member" resultType="Member">
         SELECT

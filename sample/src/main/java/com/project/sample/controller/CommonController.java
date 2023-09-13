@@ -6,6 +6,7 @@ import com.project.sample.dto.Notic;
 import com.project.sample.service.NoticService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,7 +28,11 @@ import java.util.Map;
 @Controller
 public class CommonController {
 
-    String fileDownloadPath ="C:\\pandora3\\workspace\\pandora3\\WebContent\\resources\\files\\ctg\\";
+    @Value("${fileDownloadPath}")
+    private String fileDownloadPath;
+
+
+    //String fileDownloadPath ="C:\\pandora3\\workspace\\pandora3\\WebContent\\resources\\files\\ctg\\";
 
     private final NoticService service;
     @Autowired
@@ -35,6 +40,7 @@ public class CommonController {
         this.service = service;
     }
 
+    //파일다운로드(공지사항 첨부파일)
     @GetMapping("/ctg/filedownload")
     public ResponseEntity<FileSystemResource> downloadFile(@RequestParam String filename) throws IOException {
         // 파일 경로 설정 (다운로드할 파일이 저장된 경로)
@@ -49,6 +55,7 @@ public class CommonController {
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename); // 다운로드할 파일 이름 설정
 
+            //빌드
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(file.contentLength())

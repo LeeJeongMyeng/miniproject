@@ -18,12 +18,7 @@ import java.lang.reflect.Method;
 @SpringBootApplication
 public class SampleApplication {
 
-	@Value("${ctg.ExampleString}")
-	private String ExampleString;
 
-	public void ExampleString() throws Exception {
-		System.out.println(ExampleString);
-	}
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(SampleApplication.class, args);

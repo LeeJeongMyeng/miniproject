@@ -73,7 +73,7 @@ public class FleamarketServiceImp implements FleamarketService {
         return 0;
     }
 
-    //메인페이지에 보여질 게시글 리스트+썸네일 사진 하나씩
+    //메인페이지에 보여질 플리마켓 게시글 리스트+썸네일 사진 하나씩
     @Override
     public FleaMarketDto2 get_FleaMarket_List(FleamarketDto fleamarketDto) {
         System.out.println("get_FleaMarket_List 시작");

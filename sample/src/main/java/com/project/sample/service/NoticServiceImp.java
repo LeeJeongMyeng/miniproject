@@ -23,26 +23,26 @@ public class NoticServiceImp implements NoticService {
         this.noticDao = noticDao;
     }
 
-
+    //공지사항 리스트 조회
     @Override
     public Notic2 get_Notic_List(Notic notic) {
 
         Notic2 notic2 = new Notic2();
-        System.out.println(notic.getTitle());
 
         int totCnt = noticDao.get_Notic_Count(notic);
-
-        System.out.println("검색된 공지사항 갯수:"+totCnt);
-
         int currentPage = notic.getCurrentPage(); //현재 페이지
         int onePageCnt = 10; //한 페이지 보여질 갯수
-        System.out.println("현재페이지:"+currentPage);
         int totPage = (int)Math.ceil((double)totCnt/onePageCnt);
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
         int en_rownum = currentPage * onePageCnt; //끝 rownum
 
+        System.out.println("현재페이지:"+currentPage);
+        System.out.println("검색된 공지사항 갯수:"+totCnt);
+        System.out.println("한페이지 갯수:"+onePageCnt);
+        System.out.println("페이지갯수:"+totPage);
         System.out.println("시작 rownum"+st_rownum);
         System.out.println("끝 rownum"+en_rownum);
+
 
         notic.setSt_rownum(st_rownum);
         notic.setEn_rownum(en_rownum);
@@ -58,6 +58,7 @@ public class NoticServiceImp implements NoticService {
         return notic2;
     }
 
+    //공지사항 상세 조회
     @Override
     public Map<String,Object> get_Notic(int ntno) {
         Map<String,Object> map = new HashMap<String,Object>();

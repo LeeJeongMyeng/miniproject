@@ -1,6 +1,7 @@
 package com.project.sample.common;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -11,9 +12,12 @@ import java.util.Base64;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 @Service
 public class AESImp implements AES{
-
-    private static final String key = "aesEncryptionKey"; //16Byte == 128bit
-    private static final String initVector = "encryptionIntVec"; //16Byte
+    @Value("${key}")
+    private String key;
+    @Value("${initVector}")
+    private String initVector;
+    //private static final String key = "aesEncryptionKey"; //16Byte == 128bit
+    //private static final String initVector = "encryptionIntVec"; //16Byte
 
     //인코더 생성
     private final Base64.Encoder enc = Base64.getEncoder();
@@ -73,6 +77,7 @@ public class AESImp implements AES{
         }
         return null;
     }
+
     //Bcrypt 단방향 암호화
     public String hashBcrypt(String value) {
        return BCrypt.hashpw(value, BCrypt.gensalt());
@@ -83,7 +88,7 @@ public class AESImp implements AES{
 
     }
 
-    //개인정보 가리기
+    //이름 별처리
     public String ProtectName(String name) {
         //문자 배열로 전환
         char[] Valuechars = name.toCharArray();
@@ -97,6 +102,7 @@ public class AESImp implements AES{
         //처음엔 String result ="";으로 했는데 값할당이 안됬음.
         return new String(Valuechars);
     }
+    //이메일 별처리
     public String ProtectEmail(String email) {
         //문자 배열로 전환
         char[] Valuechars = email.toCharArray();
@@ -108,6 +114,8 @@ public class AESImp implements AES{
         //처음엔 String result ="";으로 했는데 값할당이 안됬음.
         return new String(Valuechars);
     }
+
+    //핸드폰번호 별처리
     public String ProtectPhoneNumber(String pnum) {
         //문자 배열로 전환
         char[] Valuechars = pnum.toCharArray();
@@ -117,6 +125,8 @@ public class AESImp implements AES{
         //처음엔 String result ="";으로 했는데 값할당이 안됬음.
         return new String(Valuechars);
     }
+
+    //주소 구까지 처리
     public String Protectaddress(String address) {
        String[] newAddress = address.split(" ");
 

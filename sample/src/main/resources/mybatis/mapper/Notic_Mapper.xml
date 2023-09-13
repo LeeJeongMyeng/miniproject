@@ -4,6 +4,7 @@
 
 
 <mapper namespace="com.project.sample.dao.NoticDao">
+
     <!-- 공지사항 갯수 확인(페이징용) -->
     <select id="get_Notic_Count" parameterType="Notic" resultType="_int">
         SELECT COUNT(*) FROM CTG_NOTIC
@@ -21,15 +22,16 @@
         </choose>
         LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
     </select>
+
     <!-- 공지사항 리스트 select -->
     <select id="get_Notic_List" parameterType="Notic" resultType="Notic">
 
         SELECT
-            (@rownum := @rownum + 1) as ROWNUM,N.*
+            (@ROWNUM := @ROWNUM + 1) as ROWNUM,N.*
         FROM (
             SELECT
-                ntno,
-                title,
+                NTNO,
+                TITLE,
                 IMPWHETHER,
                 REGDATE,
                 UPTDATE,
@@ -47,10 +49,11 @@
                     CONCAT(TITLE,CONTENT) <!-- 전체검색 -->
                 </otherwise>
             </choose>
-            LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
+            LIKE
+                CONCAT('%',#{title,jdbcType=VARCHAR},'%')
             AND NOTICSTATE = 1
             ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
-        HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}
+        HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
         ORDER BY ROWNUM
     </select>
 
@@ -61,15 +64,17 @@
             CONTENT,
             IMPWHETHER,
             REGDATE
-        from CTG_NOTIC
-        where ntno =#{ntno,jdbcType=NUMERIC};
+        FROM CTG_NOTIC
+        WHERE NTNO =#{ntno,jdbcType=NUMERIC};
     </select>
 
     <select id="get_Notic_files" parameterType="_int" resultType="Notic">
-        select
+        SELECT
             *
-        from CTG_NOTIC_FILES
-        WHERE ntno = #{ntno,jdbcType=NUMERIC};
+        FROM
+            CTG_NOTIC_FILES
+        WHERE
+            NTNO = #{ntno,jdbcType=NUMERIC};
     </select>
 
 </mapper>

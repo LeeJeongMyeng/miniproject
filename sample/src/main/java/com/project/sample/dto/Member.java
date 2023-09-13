@@ -21,5 +21,5 @@ public class Member {
     private Date joinDate; //가입일자
     private Date delDate; //탈퇴일자
     //데이터베이스에서는 사업자 유무를 가지고 판단후에 사업자 번호확인하는 식으로 진행하자
-    private String bnNumber; //사업자번호
+    private String b_no; //사업자번호
 }

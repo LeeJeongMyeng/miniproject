@@ -1,27 +1,26 @@
 CREATE TABLE ctg_Member(
-                         userno         int        PRIMARY KEY, #유저번호
-                         email          varchar(100),            #이메일
+                         userno         int       PRIMARY KEY,    #유저번호
+                         email          varchar(100),             #이메일
                          password       varchar(100),             #비밀번호
-                         name           varchar(100),              #이름
+                         name           varchar(100),             #이름
                          phoneNumber    varchar(100),             #폰번호
-                         postcode       int,                     #우편번호
-                         address        varchar(100),            #주소
-                         extraAddress   varchar(100),            #부가주소
-                         detailAddress  varchar(100),            #상세주소
-                         bnCheck        boolean,                 #사업자여부
-                         state          boolean,                 #탈퇴여부
-                         joinDate       date,                    #가입날짜
-                         delDate        date                     #탈퇴날짜
-);
+                         postcode       int,                      #우편번호
+                         address        varchar(100),             #주소
+                         extraAddress   varchar(100),             #부가주소
+                         detailAddress  varchar(100),             #상세주소
+                         bnCheck        boolean,                  #사업자여부
+                         state          boolean,                  #탈퇴여부
+                         joinDate       date,                     #가입날짜
+                         delDate        date,                     #탈퇴날짜
+                         b_no           varchar(100)              #사업자번호
 
-create table ctg_user_bs(
-    userno   varchar(13) primary key,
-    bnNumber varchar(100)
 );
 
 
+SELECT * FROM FLEAMARKET;
 
-drop TABLE ctg_Member;
+
+drop TABLE CTG_MEMBER;
 
 create table sequences
 (
@@ -58,7 +57,8 @@ COMMIT;
 -- mybatis 회원가입 양식
 # INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
 
-INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
+INSERT INTO CTG_MEMBER VALUES (
+                               CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
                                'email',
                                'password',
                                'name',
@@ -73,6 +73,12 @@ INSERT INTO CTG_MEMBER VALUES (CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('s
                                NULL
     );
 
+INSERT INTO  CTG_USER_BS VALUES (#{userno,jdbcType=VARCHAR},#{b_no,jdbcType=VARCHAR})
+;
+
+SELECT COUNT(*) FROM CTG_USER_BS WHERE B_NO = #{b_no,jdbcType=VARCHAR}
+
+
 SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')) FROM DUAL;
 
 DELETE FROM CTG_MEMBER;
@@ -82,7 +88,7 @@ COMMIT ;
 
 
 -- 회원 이메일 중복여부
-SELECT COUNT(*) FROM CTG_MEMBER
+SELECT COUNT(*) FROM CTG_USER_BS
 where EMAIL = '';
 
 

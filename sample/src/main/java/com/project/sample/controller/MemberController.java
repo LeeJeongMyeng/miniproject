@@ -32,22 +32,12 @@ public class MemberController {
     }
 
 
-    //이름/주민 중복검사
-    @PostMapping("/ctg/Check_SignUp_name")
-    public Map<String, Integer> Check_SignUp_name(@RequestBody Member member) throws Exception {
-        Map<String, Integer> map = new HashMap<String, Integer>();
-        map.put("checkNum", service.Check_SignUp_name(member));
-
-        return map;
-    }
-
-
     //이메일 중복검사
     @PostMapping("/ctg/Check_SignUp_email")
 //    public Object Check_SignUp_email(@RequestParam("email") String email) throws Exception{
     public Map<String, Integer> Check_SignUp_email(@RequestBody Member member) throws Exception {
 
-        System.out.println(member.getEmail());
+        System.out.println("이메일 중복검사(/ctg/Check_SignUp_email) 실행");
         //JSONObject json = new JSONObject();
 
         Map<String, Integer> map = new HashMap<String, Integer>();
@@ -57,10 +47,21 @@ public class MemberController {
 
         return map;
     }
+    //사업자번호 중복검사
+    @PostMapping("/ctg/BN_Check")
+    public int BN_Check(@RequestBody Member member){
+
+        System.out.println("사업자번호 중복검사(/ctg/BN_Check) 실행");
+
+        return  service.BN_Check(member);
+    }
 
     //회원가입
     @PostMapping("/ctg/Ins_Ctg_Member")
     public int Ins_Ctg_Member(@RequestBody Member member) throws IllegalAccessException {
+
+        System.out.println("회원가입(/ctg/Ins_Ctg_Member) 실행");
+
         Map<String, Integer> map = new HashMap<String, Integer>();
         //map.put("checkNum", service.Ins_Ctg_Member(member));
         return service.Ins_Ctg_Member(member);
@@ -69,34 +70,30 @@ public class MemberController {
     //로그인
     @PostMapping("/ctg/SignIn_Ctg_Member")
     public ResponseEntity SignIn_Ctg_Member(@RequestBody Member member, HttpServletResponse res) throws IllegalAccessException {
+
+        System.out.println("로그인(/ctg/SignIn_Ctg_Member) 실행");
+
        Member member2 = service.SignIn_Ctg_Member(member);
-        //System.out.println("member not empyt? =>"+member.getName());
         if(member2 != null){
             System.out.println("member not empyt? =>"+member2.getName());
             //토큰화시키기
             String token = jwtService.getToken("member", member2);
-
             // 쿠키로 만들어서 자바스크립트로는 접근할 수 없도록함
             Cookie cookie = new Cookie("token", token);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
-
             res.addCookie(cookie);
-
             return new ResponseEntity<>(member2,HttpStatus.OK);
         }
-
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-        //eturn map;
     }
 
 
     //토큰 확인하기
     @GetMapping("/ctg/account_check")
     public ResponseEntity account_check(@CookieValue(value = "token",required = false) String token){
+        System.out.println("토근 존재유무(/ctg/account_check) 실행");
         Claims claims =  jwtService.getClaims(token);
-
         if(claims != null){
             // 아래 주석처럼 데이터 변환을하면
             // java.util.LinkedHashMap cannot be cast to com.project.sample.dto.Member] with root cause 캐스트할수 없다는 에러가난다
@@ -112,7 +109,7 @@ public class MemberController {
 
     @PostMapping("/ctg/logout")
     public ResponseEntity logout (HttpServletResponse res)throws IllegalAccessException {
-        System.out.println("로그아웃");
+        System.out.println("로그아웃(/ctg/logout) 실행");
         Cookie cookie = new Cookie("token", null);
         cookie.setMaxAge(0);
         res.addCookie(cookie);

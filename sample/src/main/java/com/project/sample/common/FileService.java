@@ -15,10 +15,13 @@ import java.util.UUID;
 
 @Service
 public class FileService {
-    //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
-      String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
+    @Value("${fileDownloadPath}")
+    private String path;
+      //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
+      //String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
 
-    //고유ID Version
+
+    //파일 생성(UUID)
     public String Insprofileimg(MultipartFile file) {
         //집
         //노트북

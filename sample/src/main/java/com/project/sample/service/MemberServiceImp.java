@@ -27,14 +27,18 @@ public class MemberServiceImp implements MemberService {
 
     //이메일 중복검사
     @Override
-    public int Check_SignUp_name(Member member) {
-        return dao.Check_SignUp_name(member);
+    public int Check_SignUp_email(String email) {
+
+        return dao.Check_SignUp_email(email);
     }
 
-    //이름/주민 중복검사
+    //사업자번호 중복검사
     @Override
-    public int Check_SignUp_email(String email) {
-        return dao.Check_SignUp_email(email);
+    public int BN_Check(Member member) {
+
+        member.setB_no(aes.encrypt(member.getB_no()));
+
+        return dao.BN_Check(member);
     }
 
     //회원가입
@@ -51,7 +55,7 @@ public class MemberServiceImp implements MemberService {
             //private혹은 projected 필드에 접근할 수 있도록 허용
             field.setAccessible(true);
             String fieldName = field.getName();
-            // 해당 필드가 String 타입이거나 필드명이 email이 아닐경우
+            // 해당 필드가 String 타입일경우
             if (field.getType().equals(String.class)) {
                 try {
                     // 필드명을 가져옴  맨앞글자 대문자+맨앞글자제외문자 => Name,Eamil
@@ -92,13 +96,15 @@ public class MemberServiceImp implements MemberService {
                 }
             }
         }
-
-        for (Field field : member.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            System.out.println(field.getName()+":"+field.get(member));
-        }
+        //잘 처리되었는지 확인용
+//        for (Field field : member.getClass().getDeclaredFields()) {
+//            field.setAccessible(true);
+//            System.out.println(field.getName()+":"+field.get(member));
+//        }
 
         //DB에 저장
+
+
         return dao.Ins_Ctg_Member(member);
         //return 0;
     }
@@ -136,7 +142,6 @@ public class MemberServiceImp implements MemberService {
 
         return memberInfo;
     }
-
 
 
 
