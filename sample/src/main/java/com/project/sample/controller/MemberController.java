@@ -71,19 +71,6 @@ public class MemberController {
 
        System.out.println("로그인(/ctg/SignIn_Ctg_Member) 실행");
 
-       //Member member2 = service.SignIn_Ctg_Member(member);
-
-//        if(member2 != null){
-//            //토큰화시키기
-//            String token = jwtService.getToken("member", member2);
-//            // 쿠키로 만들어서 자바스크립트로는 접근할 수 없도록함
-//            Cookie cookie = new Cookie("token", token);
-//            cookie.setHttpOnly(true);
-//            cookie.setPath("/");
-//            res.addCookie(cookie);
-//            return new ResponseEntity<>(member2,HttpStatus.OK);
-//        }
-
         String userid = service.SignIn_Ctg_Member(member);
 
         if(userid != null){
@@ -100,20 +87,7 @@ public class MemberController {
     }
 
 
-    //토큰 확인하기
-    @GetMapping("/ctg/account_check")
-    public ResponseEntity account_check(@CookieValue(value = "token",required = false) String token){
-        System.out.println("토근 존재유무(/ctg/account_check) 실행");
-        Claims claims =  jwtService.getClaims(token);
-        if(claims != null){
-            ObjectMapper mapper = new ObjectMapper();
-            //Member member = mapper.convertValue(claims.get("member"), Member.class);
-            String member = (String) claims.get("user_id");
-            return new ResponseEntity<>(member,HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>("",HttpStatus.OK);
-        }
-    }
+
 
     @PostMapping("/ctg/logout")
     public ResponseEntity logout (HttpServletResponse res)throws IllegalAccessException {

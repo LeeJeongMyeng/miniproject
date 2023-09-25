@@ -1,14 +1,19 @@
 package com.project.sample.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sample.dto.FileDto;
 import com.project.sample.dto.Notic;
+import com.project.sample.service.JwtService;
+import com.project.sample.service.MemberService;
 import com.project.sample.service.NoticService;
+import io.jsonwebtoken.Claims;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -31,6 +36,12 @@ public class CommonController {
     @Value("${fileDownloadPath}")
     private String fileDownloadPath;
     //String fileDownloadPath ="C:\\pandora3\\workspace\\pandora3\\WebContent\\resources\\files\\ctg\\";
+
+    private final JwtService jwtService;
+    @Autowired
+    public CommonController(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
 
     //파일다운로드(공지사항 첨부파일)
     @GetMapping("/ctg/filedownload")
@@ -55,6 +66,20 @@ public class CommonController {
                     .body(file);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    //토큰 확인하기
+    @GetMapping("/ctg/account_check")
+    public ResponseEntity account_check(@CookieValue(value = "token",required = false) String token){
+        System.out.println("토근 존재유무(/ctg/account_check) 실행");
+        Claims claims =  jwtService.getClaims(token);
+        if(claims != null){
+            ObjectMapper mapper = new ObjectMapper();
+            String member = (String) claims.get("user_id");
+            return new ResponseEntity<>(member, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>("",HttpStatus.OK);
         }
     }
 

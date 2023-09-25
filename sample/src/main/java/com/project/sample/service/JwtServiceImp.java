@@ -24,7 +24,7 @@ public class JwtServiceImp implements JwtService{
 
         Date expTime = new Date();
         //토큰의 유효시간 millisecond기준 => 5분
-        expTime.setTime(expTime.getTime()+ 1000*60*5);
+        expTime.setTime(expTime.getTime()+ 1000*60*1);
         //key를 byte로 변환
         System.out.println(secretkey);
         byte[] secretkeyByte = DatatypeConverter.parseBase64Binary(secretkey);
