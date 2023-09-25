@@ -30,12 +30,12 @@
             (@ROWNUM := @ROWNUM + 1) as ROWNUM,N.*
         FROM (
             SELECT
-                NTNO,
+                NOTICE_ID,
                 TITLE,
-                IMPWHETHER,
-                REGDATE,
-                UPTDATE,
-                DELDATE
+                IS_IMPORTANT,
+                REG_DATE,
+                UPT_DATE,
+                END_DATE
             FROM CTG_NOTIC
             WHERE
             <choose>
@@ -51,30 +51,35 @@
             </choose>
             LIKE
                 CONCAT('%',#{title,jdbcType=VARCHAR},'%')
-            AND NOTICSTATE = 1
-            ORDER BY IMPWHETHER DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
+            AND IS_STATE = 1
+            ORDER BY IS_IMPORTANT DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
         HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
         ORDER BY ROWNUM
     </select>
 
     <select id="get_Notic" parameterType="_int" resultType="Notic">
         SELECT
-            NTNO,
+            NOTICE_ID,
             TITLE,
             CONTENT,
-            IMPWHETHER,
-            REGDATE
+            IS_IMPORTANT,
+            REG_DATE
         FROM CTG_NOTIC
-        WHERE NTNO =#{ntno,jdbcType=NUMERIC};
+        WHERE NOTICE_ID =#{notice_id,jdbcType=NUMERIC};
     </select>
 
     <select id="get_Notic_files" parameterType="_int" resultType="Notic">
         SELECT
-            *
+            FILE_ID,
+            NOTICE_ID,
+            ORIGIN_FILE_NAME,
+            CHG_SOURCE_FILENAME,
+            EXTENSION,
+            FILESIZE
         FROM
             CTG_NOTIC_FILES
         WHERE
-            NTNO = #{ntno,jdbcType=NUMERIC};
+            notice_id = #{notice_id,jdbcType=NUMERIC};
     </select>
 
 </mapper>

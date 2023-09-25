@@ -6,20 +6,19 @@ import java.util.List;
 
 @Data
 public class Notic {
-    private int ntno; //게시글번호
+    private int notice_id; //게시글번호
 
     private String title; //제목
     private String content; //내용
-    private boolean impWhether; //중요여부
-    private String regDate; //생성일자
-    private String uptDate; //수정일자
-    private String delDate; //종료일자
-    private boolean fileWhether; //파일존재여부
+    private boolean is_important; //중요여부
+    private String reg_date; //생성일자
+    private String upt_date; //수정일자
+    private String end_date; //종료일자
+    private boolean has_attachment; //파일존재여부
     private boolean delDateCheck; //종료글여부
-    private boolean NoticState; //종료글여부
-    private int inq_cnt; //조회수
+    private boolean is_state; //종료글여부
 
-    private int fileno; //파일번호
+    private int file_id; //파일번호
     private String origin_file_name; //본래 파일 이름
     private String chg_source_filename; //경로+uuid+파일이름
     private String extension; // 확장자

@@ -7,6 +7,7 @@ import com.project.sample.dao.MemberDao;
 import com.project.sample.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
@@ -15,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class FleamarketServiceImp implements FleamarketService {
@@ -23,6 +25,7 @@ public class FleamarketServiceImp implements FleamarketService {
     private final MemberDao memberDao;
     private FileService fileservice;
     private final AESImp aes;
+
     @Autowired
     public FleamarketServiceImp(FleamarketDao fleamarketDao, FileService fileservice, MemberDao memberDao, AESImp aes) {
         this.fleamarketDao = fleamarketDao;
@@ -32,48 +35,70 @@ public class FleamarketServiceImp implements FleamarketService {
     }
 
     //게시글 등록 -> 해당 게시글 번호 들고 복귀
+    @Transactional(rollbackFor = {Exception.class})
     @Override
-    public int reg_FleaMarket(FleamarketDto fleamarketDto,String method) {
+    public int reg_FleaMarket(FleamarketDto fleamarketDto,List<MultipartFile> files,String method) {
+        int post_id_max=0;
 
-        if(method.equals("insert")){
-            fleamarketDao.reg_FleaMarket(fleamarketDto);
-            return fleamarketDao.FleaMarket_get_fno_max();
-        //method = update 일경우
-        }else{
-            //게시글 업데이트
-            System.out.println("수정ser");
-            fleamarketDao.upt_FleaMarket(fleamarketDto);
-            return fleamarketDto.getFno();
-        }
-    }
-    // 이미지 등록+ 파일 업로드
-    @Override
-    public int reg_FleaMarket_files(List<MultipartFile> files,int fno,String method) {
+        /*
+            insert라면 게시글 정보를 DB에 등록 후, 바로 게시글 번호를 뽑아와서
+            매개변수로 들어온 fleamarketDto의 비어있는 post_id에 다가 할당해준다.
+            해당 로직 마지막에 해당 post_id와 함께 들어온 파일의 정보를 DB에 심어주기 위함
+         */
 
-        //업데이트 일경우 기존 파일 삭제 진행
-        if(method.equals("update")){
-            //파일 리스트 부터 뽑아옴
-            del_Fleamarket_Files(fno);
-            //DB파일 리스트 삭제
-            fleamarketDao.del_FleaMarket_files(fno);
-        }
+            if(method.equals("insert")){
 
-        //파일 업로드 처리
-        FleamarketDto fleamarketDto = new FleamarketDto();
+                fleamarketDao.reg_FleaMarket(fleamarketDto);
 
-        fleamarketDto.setFno(fno);
+                fleamarketDto.setPost_id( fleamarketDao.FleaMarket_get_fno_max());
+                //method = update 일경우
+            }else{
+                //게시글 업데이트
+                System.out.println("업데이트 실행");
+                fleamarketDao.upt_FleaMarket(fleamarketDto);
 
-        for(MultipartFile file:files){
-            String origin_file_name = file.getOriginalFilename().replace(" ","");
-            fleamarketDto.setOrigin_file_name(origin_file_name);
-            //여기서 파일 업로드 되면서 UUID파일이름뽑아옴
-            fleamarketDto.setUuid_file_name(fileservice.Insprofileimg(file));
-            fleamarketDao.reg_FleaMarket_file(fleamarketDto);
-        }
-        return 0;
+                int post_id = fleamarketDto.getPost_id();
+                //파일 리스트 부터 가져옴
+                List<Fleamarket_Files> fleamarket_files = fleamarketDao.get_FleaMarket_files(post_id);
+
+                System.out.println(post_id);
+
+                for(Fleamarket_Files file:fleamarket_files){
+                    System.out.println(file.getUuid_file_name());
+                }
+
+                //DB정보삭제
+                fleamarketDao.del_FleaMarket_files(post_id);
+
+                //삭제처리
+                for(Fleamarket_Files file_Info:fleamarket_files){
+                    fileservice.DeleteFile(file_Info.getUuid_file_name());
+                }
+                post_id_max = fleamarketDto.getPost_id();
+            }
+
+            if (files != null && !files.isEmpty()) {
+                for(MultipartFile file:files){
+                    String origin_file_name = file.getOriginalFilename().replace(" ","");
+                    fleamarketDto.setOrigin_file_name(origin_file_name);
+
+                    //파일이름 중복 예방으로 uuid생성
+                    String uuid = UUID.randomUUID().toString();
+                    String uuid_file_name = uuid+"_"+file.getOriginalFilename().replace(" ","");
+
+                    //파일이름 세팅 후, DB저장
+                    fleamarketDto.setUuid_file_name(uuid_file_name);
+                    fleamarketDao.reg_FleaMarket_file(fleamarketDto);
+
+                    //파일 업로드
+                    fileservice.Insprofileimg(file,uuid_file_name);
+                }
+            }
+        return post_id_max;
     }
 
     //메인페이지에 보여질 플리마켓 게시글 리스트+썸네일 사진 하나씩
+    @Transactional(readOnly = true)
     @Override
     public FleaMarketDto2 get_FleaMarket_List(FleamarketDto fleamarketDto) {
         System.out.println("get_FleaMarket_List 시작");
@@ -93,66 +118,76 @@ public class FleamarketServiceImp implements FleamarketService {
         fleamarketDto.setEn_rownum(en_rownum);
         fleaMarketDto2.setFleamarketDtoList(fleamarketDao.get_FleaMarket_List(fleamarketDto));
 
-//        System.out.println("현재페이지:"+currentPage);
-//        System.out.println("검색단어:"+fleamarketDto.getTitle());
-//        System.out.println("현재페이지:"+st_rownum);
-//        System.out.println("현재페이지:"+en_rownum);
-//        System.out.println("검색글 갯수:"+fleaMarketDto2.getFleamarketDtoList().size());
-
         //Front에서 사용할 페이징정보
         fleaMarketDto2.setCurrentPage(currentPage);
         fleaMarketDto2.setTotPage(totPage);
         fleaMarketDto2.setOnePageCnt(onePageCnt);
+
+        System.out.println(totPage);
 
         //게시글 리스트 담기
         return fleaMarketDto2;
     }
 
     //게시글 상세조회
+    @Transactional(readOnly = true)
     @Override
-    public FleamarketDto get_FleaMarket(int fno) {
-        return fleamarketDao.get_FleaMarket(fno);
+    public Map<String,Object> get_FleaMarket(int post_id) {
+
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("FleaMarket", fleamarketDao.get_FleaMarket( post_id ));
+        map.put("FleaMarket_files", fleamarketDao.get_FleaMarket_files( post_id ));
+
+        return map;
     }
 
-    //상세조회의 이미지 파일들
-    @Override
-    public List<Fleamarket_Files> get_FleaMarket_files(int fno) {
-        return fleamarketDao.get_FleaMarket_files(fno);
-    }
 
     //게시글삭제
+    @Transactional(rollbackFor = {Exception.class})
     @Override
-    public int del_FleaMarket(int fno) {
-        //아래 파일 삭제 메서드 진행
-        del_Fleamarket_Files(fno);
+    public int del_FleaMarket(int post_id) {
         // 신청글 삭제
-        fleamarketDao.del_Application_FM(fno);
+        fleamarketDao.del_Application_FM(post_id);
         //게시글삭제
-        return fleamarketDao.del_FleaMarket(fno);
+        fleamarketDao.del_FleaMarket(post_id);
+
+        //파일 삭제를 위해서 게시글 파일 정보를 미리뽑아옴
+        List<Fleamarket_Files> fleamarket_files = fleamarketDao.get_FleaMarket_files(post_id);
+        //DB정보삭제
+        fleamarketDao.del_FleaMarket_files(post_id);
+        //파일삭제처리
+        for(Fleamarket_Files file_Info:fleamarket_files){
+            fileservice.DeleteFile(file_Info.getUuid_file_name());
+        }
+        return 0;
     }
+
+
 
     //신청하기
+    @Transactional(rollbackFor = {Exception.class})
     @Override
-    public int application_FM(int fno, String userno) {
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("fno",fno);
-        map.put("userno",userno);
+    public int application_FM( int post_id, String user_id ) {
 
-        return fleamarketDao.application_FM(map);
+        int result = 0;
+
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("post_id",post_id);
+        map.put("user_id",user_id);
+        //중복 신청 확인
+        int Checknum = fleamarketDao.Check_Application( map );
+        //신청
+        if( Checknum == 0 ) {
+            result = fleamarketDao.application_FM( map );
+        }
+
+        return result;
     }
 
-    //동일신청자 중복 확인
-    @Override
-    public int Check_Application(int fno, String userno) {
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("fno",fno);
-        map.put("userno",userno);
 
-
-        return fleamarketDao.Check_Application(map);
-    }
 
     //특정 게시글에 대한 신청자 목록 확인
+    @Transactional(readOnly = true)
     @Override
     public Map<String,Object> get_application_FM(Application_FM applicationFm) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         Map<String , Object> map = new HashMap<>();
@@ -178,7 +213,7 @@ public class FleamarketServiceImp implements FleamarketService {
                     field.setAccessible(true);
                     String fieldName = field.getName();
                     //복호화가 필요없는 컬럼이 아닐경우
-                    if( fieldName.equals("name") || fieldName.equals("address") || fieldName.equals("phoneNumber") ||fieldName.equals("email")){
+                    if( fieldName.equals("name") || fieldName.equals("address") || fieldName.equals("phone_number") ||fieldName.equals("email")){
                         //set/get을 위해 field이름의 앞글자를 대문자로 전환
                         String methodName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
                         // 현재 필드의 get+methodName으로 getter호출
@@ -203,7 +238,7 @@ public class FleamarketServiceImp implements FleamarketService {
                //이메일 별처리
                 a.setEmail(aes.ProtectEmail(a.getEmail()));
                //폰번 별처리
-                a.setPhoneNumber(aes.ProtectPhoneNumber(a.getPhoneNumber()));
+                a.setPhone_number(aes.ProtectPhoneNumber(a.getPhone_number()));
                //주소 구까지 처리
                 a.setAddress(aes.Protectaddress(a.getAddress()));
             }
@@ -217,29 +252,32 @@ public class FleamarketServiceImp implements FleamarketService {
     }
 
     //승인/대기/거부시 업데이트
+    @Transactional(rollbackFor = {Exception.class})
     @Override
     public int upt_application_FM( Application_FM applicationFm ) {
+        int count = 0;
+        //특정 유저에 대해 승인/거절/대기 상대 업테이드
+        int result = fleamarketDao.upt_application_FM( applicationFm );
 
-        //System.out.println("상태 수정될 게시글번호:"+applicationFm.getFno());
-        //System.out.println("상태 수정될 상태값:"+applicationFm.getState());
-        //System.out.println("상태 수정될 유저번호:"+applicationFm.getUserno());
+        if(result==1){
 
-        return fleamarketDao.upt_application_FM( applicationFm );
-    }
+            //승인 갯수 세기
+            count = fleamarketDao.get_Application_count( applicationFm.getPost_id() );
 
-    //상태 업데이트 이후, 해당 게시글의 승인갯수 업데이트
-    @Override
-    public int upt_apl_FM_ACount( Application_FM applicationFm ) {
+            //해당 게시글의 curCnt(현재승인갯수) 업데이트
+            applicationFm.setCount(count);
 
-        //현재 승인처리된 갯수불러오기
-        int count = fleamarketDao.get_Application_count( applicationFm.getFno() );
-        applicationFm.setCount(count);
-        //해당 게시글의 승인 갯수 업데이트
-        fleamarketDao.upt_apl_FM_Count(applicationFm);
+            //해당 게시글의 승인 갯수 업데이트
+            fleamarketDao.upt_apl_FM_Count(applicationFm);
+
+        }
+
         return count;
     }
 
+
     //본인이 작성한 플리마켓 게시글
+    @Transactional(readOnly = true)
     @Override
     public FleaMarketDto2 get_My_FleaMarket( FleamarketDto fleamarketDto ) {
         System.out.println("get_FleaMarket_List 실행");
@@ -251,11 +289,6 @@ public class FleamarketServiceImp implements FleamarketService {
         int totPage = (int)Math.ceil( (double)totCnt/onePageCnt ); //총 페이지 갯수
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
         int en_rownum = currentPage * onePageCnt; //끝 rownum
-
-        // System.out.println("현재페이지:"+currentPage);
-        //System.out.println("검색단어:"+fleamarketDto.getTitle());
-        //System.out.println("시작 ROWNUM:"+st_rownum);
-        //System.out.println("끝 ROWNUM:"+en_rownum);
 
         //검색전 ROWNUM 세팅
         fleamarketDto.setSt_rownum(st_rownum);
@@ -270,6 +303,7 @@ public class FleamarketServiceImp implements FleamarketService {
     }
 
     //본인이 신청한 플리마켓 글 목록 확인
+    @Transactional(readOnly = true)
     @Override
     public FleaMarketDto2 get_My_Application(FleamarketDto fleamarketDto){
         System.out.println( "get_FleaMarket_List 시작" );
@@ -283,12 +317,6 @@ public class FleamarketServiceImp implements FleamarketService {
         int totPage = (int)Math.ceil( (double)totCnt/onePageCnt ); //총 페이지 갯수
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
         int en_rownum = currentPage * onePageCnt; //끝 rownum
-
-        //System.out.println("Application:현재페이지:"+currentPage);
-        //System.out.println("Application 전체페이지"+totCnt);
-        //System.out.println("현재페이지:"+st_rownum);
-        //System.out.println("현재페이지:"+en_rownum);
-
 
         //검색 내용 및 ROWNUM에 맞는 게시글 들고와서 담기
         fleamarketDto.setSt_rownum(st_rownum);
@@ -305,16 +333,6 @@ public class FleamarketServiceImp implements FleamarketService {
     }
 
 //=======================================================================================
-    //파일 삭제처리 공통 메서드
-    public void del_Fleamarket_Files(int fno){
-        //파일 리스트 부터 뽑아옴
-        List<Fleamarket_Files> fleamarket_files = fleamarketDao.get_FleaMarket_files(fno);
-        //파일 삭제
-        for(Fleamarket_Files file:fleamarket_files){
-            fileservice.DeleteFile(file.getUuid_file_name());
-        }
 
-        fleamarketDao.del_FleaMarket_files(fno);
-    }
 
 }

@@ -7,6 +7,7 @@ import com.project.sample.dto.Notic;
 import com.project.sample.dto.Notic2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,6 +25,7 @@ public class NoticServiceImp implements NoticService {
     }
 
     //공지사항 리스트 조회
+    @Transactional(readOnly = true)
     @Override
     public Notic2 get_Notic_List(Notic notic) {
 
@@ -36,19 +38,11 @@ public class NoticServiceImp implements NoticService {
         int st_rownum = (currentPage-1) * onePageCnt +1; //시작 rounum
         int en_rownum = currentPage * onePageCnt; //끝 rownum
 
-        System.out.println("현재페이지:"+currentPage);
-        System.out.println("검색된 공지사항 갯수:"+totCnt);
-        System.out.println("한페이지 갯수:"+onePageCnt);
-        System.out.println("페이지갯수:"+totPage);
-        System.out.println("시작 rownum"+st_rownum);
-        System.out.println("끝 rownum"+en_rownum);
-
-
         notic.setSt_rownum(st_rownum);
         notic.setEn_rownum(en_rownum);
         notic2.setNoticList(noticDao.get_Notic_List(notic));
         for(Notic n:notic2.getNoticList()){
-            System.out.println(n.getNtno());
+            System.out.println(n.getNotice_id());
         }
         notic2.setCurrentPage(currentPage);
         notic2.setTotPage(totPage);
@@ -59,6 +53,7 @@ public class NoticServiceImp implements NoticService {
     }
 
     //공지사항 상세 조회
+    @Transactional(readOnly = true)
     @Override
     public Map<String,Object> get_Notic(int ntno) {
         Map<String,Object> map = new HashMap<String,Object>();

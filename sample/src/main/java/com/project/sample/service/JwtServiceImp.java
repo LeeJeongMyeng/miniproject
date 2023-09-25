@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class JwtServiceImp implements JwtService{
 
-    @Value("secretkey")
+    @Value("${secretkey}")
     private String secretkey;
 
     //토큰 생성
@@ -23,7 +23,7 @@ public class JwtServiceImp implements JwtService{
     public String getToken(String key, Object value) {
 
         Date expTime = new Date();
-        //토큰의 유효시간 millisecond기준 => 30분
+        //토큰의 유효시간 millisecond기준 => 5분
         expTime.setTime(expTime.getTime()+ 1000*60*5);
         //key를 byte로 변환
         System.out.println(secretkey);
@@ -54,8 +54,9 @@ public class JwtServiceImp implements JwtService{
     //Claims 생성
     @Override
     public Claims getClaims(String token) {
-        if(token !=null && !"".equals(token)){
+        if(token !=null && !token.isEmpty()){
             try{
+                System.out.println(secretkey);
                 byte[] secretkeyByte = DatatypeConverter.parseBase64Binary(secretkey);
                 Key signKey = new SecretKeySpec(secretkeyByte, SignatureAlgorithm.HS256.getJcaName());
                 return (Claims) Jwts.parser().setSigningKey(signKey).parseClaimsJws(token).getBody();

@@ -15,21 +15,17 @@ import java.util.UUID;
 
 @Service
 public class FileService {
-    @Value("${fileDownloadPath}")
-    private String path;
+//    @Value("${fileUpload}")
+//    private String path;
       //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
-      //String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket";
+      String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
 
 
     //파일 생성(UUID)
-    public String Insprofileimg(MultipartFile file) {
+    public void Insprofileimg(MultipartFile file,String uuid_file_name) {
         //집
         //노트북
 
-        //고유 ID생성하는 내장 함수 ==> 중복파일 방지
-        String uuid = UUID.randomUUID().toString();
-        // 고유 ID+파일이름으로 심어줌
-        String fname = uuid+"_"+file.getOriginalFilename().replace(" ","");;
         System.out.println(path);
 
         File Folder = new File(path);
@@ -45,7 +41,7 @@ public class FileService {
         }else {
             System.out.println("폴더가 이미 존재합니다..");
         }
-        File f = new File(path+"\\"+fname);
+        File f = new File(path+"\\"+uuid_file_name);
 
         try {
         file.transferTo(f); // 필수예외 처리 (IO발생)
@@ -55,7 +51,6 @@ public class FileService {
             System.out.println("파일업로드 예외2:"+e.getMessage());
         }
 
-        return fname;
     }
 
     //파일 삭제처리

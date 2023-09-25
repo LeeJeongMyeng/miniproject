@@ -17,18 +17,29 @@ CREATE USER 'root'@'%' identified BY '1111';
 SELECT * FROM TBBS_TMP_DOC_INF;
 
 --   ---------------------------------------------------------------------
-CREATE TABLE dㅡㅛㄴCTG_NOTIC (
-                               ntno int PRIMARY KEY AUTO_INCREMENT, -- 공지글번호
-                               title varchar(200), -- 제목
-                               content varchar(10000), -- 내용
-                               impwhether boolean, -- 중요여부
-                               regdate datetime, -- 등록날짜
-                               uptdate datetime, -- 수정날짜
-                               deldate datetime, -- 종료날짜
-                               filewhether boolean, -- 파일존재여부
-                               NoticState boolean,
-                               inq_cnt int -- 조회수
+CREATE TABLE CTG_NOTIC (
+                            notice_id         int           PRIMARY KEY AUTO_INCREMENT,  -- 공지글 ID
+                            title             varchar(200),                               -- 제목
+                            content           varchar(5000),                             -- 내용
+                            is_important      boolean,                                    -- 중요 여부 (true/false)
+                            reg_date          date,                                   -- 등록 날짜 및 시간
+                            upt_date          date,                                   -- 수정 날짜 및 시간
+                            end_date          date,                                   -- 종료 날짜 및 시간
+                            has_attachment    boolean,                                    -- 첨부 파일 존재 여부 (true/false)
+                            is_state      boolean                                    -- 공지 상태 (true/false)
 );
+
+CREATE TABLE CTG_NOTIC_FILES(
+    file_id int AUTO_INCREMENT PRIMARY KEY, -- 파일 pk
+    notice_id int,                          -- 공지사항 게시글번호
+    origin_file_name varchar(100),          -- 파일 이름
+    chg_source_filename varchar(200),       -- 저장될 파일이름
+    extension varchar(10),                  -- 확장자
+    filesize int                            -- 파일 사이즈
+
+);
+
+DROP TABLE CTG_NOTIC_FILES;
 
 INSERT INTO pandora3_ojt.ctg_notic values(0,#{title},#{content},{impWhether},SYSDATE(),SYSDATE(),#{delDate},#{fileWhether});
 

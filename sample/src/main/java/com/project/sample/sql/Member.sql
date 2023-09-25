@@ -1,24 +1,29 @@
 CREATE TABLE ctg_Member(
-                         userno         int       PRIMARY KEY,    #유저번호
-                         email          varchar(100),             #이메일
-                         password       varchar(100),             #비밀번호
-                         name           varchar(100),             #이름
-                         phoneNumber    varchar(100),             #폰번호
-                         postcode       int,                      #우편번호
-                         address        varchar(100),             #주소
-                         extraAddress   varchar(100),             #부가주소
-                         detailAddress  varchar(100),             #상세주소
-                         bnCheck        boolean,                  #사업자여부
-                         state          boolean,                  #탈퇴여부
-                         joinDate       date,                     #가입날짜
-                         delDate        date,                     #탈퇴날짜
-                         b_no           varchar(100)              #사업자번호
-
+                         user_id          int       PRIMARY KEY,    #유저번호
+                         email            varchar(100),             #이메일
+                         password         varchar(100),             #비밀번호
+                         name             varchar(100),             #이름
+                         phone_number     varchar(100),             #폰번호
+                         postal_code        int,                    #우편번호
+                         address          varchar(200),             #주소
+                         extra_Address    varchar(200),             #부가주소
+                         detail_Address   varchar(200),             #상세주소
+                         is_business        boolean,                #사업자여부
+                         is_active          boolean,                #탈퇴여부
+                         join_Date        date,                     #가입날짜
+                         leave_Date       date,                     #탈퇴날짜
+                         business_number  varchar(100),             #사업자번호
+                         upt_date         date                      #수정일자
 );
 
 
-SELECT * FROM FLEAMARKET;
+SELECT * FROM CTG_MEMBER;
 
+update CTG_MEMBER
+set BUSINESS_NUMBER = null,IS_BUSINESS = false
+where USER_ID = 2023092243;
+
+DELETE FROM CTG_MEMBER;
 
 drop TABLE CTG_MEMBER;
 
@@ -55,7 +60,7 @@ SELECT * FROM CTG_MEMBER;
 
 COMMIT;
 -- mybatis 회원가입 양식
-# INSERT INTO CTG_MEMBER VALUES (userno,email,password,name,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
+# INSERT INTO CTG_MEMBER VALUES (user_id,email,password,name,PHONENUMBER,POSTCODE,ADDRESS,EXTRAADDRESS,DETAILADDRESS,bnCheck,STATE,JOINDATE,DELDATE);
 
 INSERT INTO CTG_MEMBER VALUES (
                                CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),nextval('seq_member')),
@@ -73,7 +78,7 @@ INSERT INTO CTG_MEMBER VALUES (
                                NULL
     );
 
-INSERT INTO  CTG_USER_BS VALUES (#{userno,jdbcType=VARCHAR},#{b_no,jdbcType=VARCHAR})
+INSERT INTO  CTG_USER_BS VALUES (#{user_id,jdbcType=VARCHAR},#{b_no,jdbcType=VARCHAR})
 ;
 
 SELECT COUNT(*) FROM CTG_USER_BS WHERE B_NO = #{b_no,jdbcType=VARCHAR}
@@ -94,7 +99,7 @@ where EMAIL = '';
 
 SELECT CONCAT(DATE_FORMAT(SYSDATE(),'%Y%m%d'),'-','B-',0) FROM DUAL;
 
-SELECT USERNO,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
+SELECT user_id,NAME,EMAIL,PASSWORD,BNCHECK FROM CTG_MEMBER
 WHERE STATE = 1
   AND EMAIL = 'z@nate.com';
 

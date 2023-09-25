@@ -62,8 +62,6 @@ public class MemberController {
 
         System.out.println("회원가입(/ctg/Ins_Ctg_Member) 실행");
 
-        Map<String, Integer> map = new HashMap<String, Integer>();
-        //map.put("checkNum", service.Ins_Ctg_Member(member));
         return service.Ins_Ctg_Member(member);
     }
 
@@ -71,19 +69,32 @@ public class MemberController {
     @PostMapping("/ctg/SignIn_Ctg_Member")
     public ResponseEntity SignIn_Ctg_Member(@RequestBody Member member, HttpServletResponse res) throws IllegalAccessException {
 
-        System.out.println("로그인(/ctg/SignIn_Ctg_Member) 실행");
+       System.out.println("로그인(/ctg/SignIn_Ctg_Member) 실행");
 
-       Member member2 = service.SignIn_Ctg_Member(member);
-        if(member2 != null){
-            System.out.println("member not empyt? =>"+member2.getName());
+       //Member member2 = service.SignIn_Ctg_Member(member);
+
+//        if(member2 != null){
+//            //토큰화시키기
+//            String token = jwtService.getToken("member", member2);
+//            // 쿠키로 만들어서 자바스크립트로는 접근할 수 없도록함
+//            Cookie cookie = new Cookie("token", token);
+//            cookie.setHttpOnly(true);
+//            cookie.setPath("/");
+//            res.addCookie(cookie);
+//            return new ResponseEntity<>(member2,HttpStatus.OK);
+//        }
+
+        String userid = service.SignIn_Ctg_Member(member);
+
+        if(userid != null){
             //토큰화시키기
-            String token = jwtService.getToken("member", member2);
+            String token = jwtService.getToken("user_id", userid);
             // 쿠키로 만들어서 자바스크립트로는 접근할 수 없도록함
             Cookie cookie = new Cookie("token", token);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             res.addCookie(cookie);
-            return new ResponseEntity<>(member2,HttpStatus.OK);
+            return new ResponseEntity<>(userid,HttpStatus.OK);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
@@ -95,15 +106,12 @@ public class MemberController {
         System.out.println("토근 존재유무(/ctg/account_check) 실행");
         Claims claims =  jwtService.getClaims(token);
         if(claims != null){
-            // 아래 주석처럼 데이터 변환을하면
-            // java.util.LinkedHashMap cannot be cast to com.project.sample.dto.Member] with root cause 캐스트할수 없다는 에러가난다
-            //Member member = (member)claims.get("member");
-            //해서 아래처럼 사용해야함
             ObjectMapper mapper = new ObjectMapper();
-            Member member = mapper.convertValue(claims.get("member"), Member.class);
+            //Member member = mapper.convertValue(claims.get("member"), Member.class);
+            String member = (String) claims.get("user_id");
             return new ResponseEntity<>(member,HttpStatus.OK);
         }else{
-            return new ResponseEntity<>(null,HttpStatus.OK);
+            return new ResponseEntity<>("",HttpStatus.OK);
         }
     }
 
@@ -111,8 +119,11 @@ public class MemberController {
     public ResponseEntity logout (HttpServletResponse res)throws IllegalAccessException {
         System.out.println("로그아웃(/ctg/logout) 실행");
         Cookie cookie = new Cookie("token", null);
-        cookie.setMaxAge(0);
+        cookie.setMaxAge(0); // 유효기간을 0으로 설정하여 바로 만료시킵니다.
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
         res.addCookie(cookie);
+
         return new ResponseEntity<>(null,HttpStatus.OK);
     }
 

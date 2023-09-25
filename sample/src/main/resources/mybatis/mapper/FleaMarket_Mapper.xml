@@ -10,22 +10,21 @@
         INSERT INTO FLEAMARKET
         VALUES (
              0,
-             #{userno,jdbcType=VARCHAR},
-             #{email,jdbcType=VARCHAR},
+             #{user_id,jdbcType=VARCHAR},
              #{title,jdbcType=VARCHAR},
              #{content,jdbcType=VARCHAR},
-             #{address,jdbcType=VARCHAR},
-             #{detailAddress,jdbcType=VARCHAR},
-             #{approvalCnt,jdbcType=NUMERIC},
-             #{curCnt,jdbcType=NUMERIC},
-             #{endDate,jdbcType=VARCHAR},
+             #{location,jdbcType=VARCHAR},
+             #{sub_location,jdbcType=VARCHAR},
+             #{max_applicants,jdbcType=NUMERIC},
+             #{current_count,jdbcType=NUMERIC},
+             #{end_date,jdbcType=VARCHAR},
              SYSDATE(),
              SYSDATE()
        )
-    </insert>
+   </insert>
 <!--플리마켓 게시글 등록시 파일업로드용 게시글 번호 조회-->
     <select id="FleaMarket_get_fno_max" resultType="_int">
-        SELECT MAX(FNO) FROM FLEAMARKET
+        SELECT MAX(POST_ID) FROM FLEAMARKET
     </select>
 
 <!--플리마켓 파일등록-->
@@ -33,7 +32,8 @@
         INSERT INTO
             FLEAMARKET_FILES
         VALUES (
-            #{fno,jdbcType=NUMERIC},
+            0,
+            #{post_id,jdbcType=NUMERIC},
             #{origin_file_name,jdbcType=VARCHAR},
             #{uuid_file_name,jdbcType=VARCHAR}
         )
@@ -45,37 +45,63 @@
         <![CDATA[
 
         SELECT
-            (@ROWNUM := @ROWNUM + 1) AS ROWNUM,
-            F.*,
-            MIN(F2.UUID_FILE_NAME) AS UUID_FILE_NAME
+            ROWNUM,
+            POST_ID,
+            TITLE,
+            LOCATION,
+            CURRENT_COUNT,
+            REG_DATE,
+            MAX_APPLICANTS,
+            END_DATE,
+            STATE,
+            UUID_FILE_NAME,
+            ORIGIN_FILE_NAME
         FROM (
-            SELECT
-                  FNO,
-                  TITLE,
-                  SUBSTRING_INDEX(ADDRESS, ' ', 3) AS ADDRESS,
-                  CURCNT,
-                  DATE_FORMAT(REGDATE,'%Y-%m-%d') REGDATE,
-                  APPROVALCNT,ENDDATE,
-                  CASE WHEN STR_TO_DATE(ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
-                  ELSE '모집중'
-                  END AS STATE
-              FROM FLEAMARKET
-            -- 조건절
-              WHERE CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE  CONCAT('%',#{title,jdbcType=VARCHAR},'%')
-              ORDER BY FNO DESC
-             )
-            AS F LEFT JOIN (
-                SELECT
-                    FILES.FNO,
-                    FILES.UUID_FILE_NAME
-                FROM FLEAMARKET_FILES FILES
-                ORDER BY FILES.UUID_FILE_NAME
-            )
-            AS F2 ON F.FNO = F2.FNO,
-             (SELECT @rownum := 0) r
-        GROUP BY F.FNO
-        HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
-        ORDER BY ROWNUM
+                 SELECT
+                     (@ROWNUM := @ROWNUM + 1) AS ROWNUM,
+                     A.*
+                 FROM (
+                          SELECT
+                              F.POST_ID,
+                              TITLE,
+                              SUBSTRING_INDEX(LOCATION, ' ', 3) AS LOCATION,
+                              CURRENT_COUNT,
+                              DATE_FORMAT(REG_DATE,'%Y-%m-%d') AS REG_DATE,
+                              MAX_APPLICANTS,
+                              CASE WHEN STR_TO_DATE(END_DATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
+                                   ELSE '모집중'
+                                  END AS STATE,
+                              END_DATE,
+                              FILE2.UUID_FILE_NAME,
+                              FILE2.ORIGIN_FILE_NAME
+                          FROM
+                              FLEAMARKET AS F
+                                  INNER JOIN (
+                                  SELECT
+                                      FILE1.POST_ID,
+                                      FILE1.ORIGIN_FILE_NAME,
+                                      FILE1.UUID_FILE_NAME
+                                  FROM
+                                      FLEAMARKET_FILES AS FILE1
+                                          INNER JOIN (
+                                              SELECT
+                                                  POST_ID,
+                                                  MAX(FILE_ID) AS MAX_FILE_ID
+                                              FROM
+                                                  FLEAMARKET_FILES
+                                              GROUP BY
+                                                  POST_ID
+                                          ) AS MAX_FILE
+                                          ON
+                                             FILE1.POST_ID = MAX_FILE.POST_ID
+                                          AND
+                                             FILE1.FILE_ID = MAX_FILE.MAX_FILE_ID
+                              ) AS FILE2
+                                             ON F.POST_ID = FILE2.POST_ID
+                                                 AND CONCAT(F.TITLE,F.LOCATION,F.SUB_LOCATION) LIKE  CONCAT('%',#{title,jdbcType=VARCHAR},'%')
+                      ) AS A, (SELECT @rownum := 0) r
+             ) AS F
+        WHERE F.ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
 
         ]]>
     </select>
@@ -87,7 +113,7 @@
         FROM
             FLEAMARKET
         WHERE
-            CONCAT(TITLE,ADDRESS,DETAILADDRESS) LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
+            CONCAT(TITLE,LOCATION,SUB_LOCATION) LIKE CONCAT('%',#{title,jdbcType=VARCHAR},'%')
     </select>
 
     <!-- 상세조회 게시글-->
@@ -95,11 +121,11 @@
         <![CDATA[
 
         SELECT *,
-               CASE WHEN STR_TO_DATE(ENDDATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
+               CASE WHEN STR_TO_DATE(END_DATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
                 ELSE '모집중'
                 END AS STATE
         FROM FLEAMARKET
-        WHERE FNO = #{fno,jdbcType=NUMERIC}
+        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
 
         ]]>
     </select>
@@ -109,7 +135,7 @@
             *
         FROM
             FLEAMARKET_FILES
-        WHERE FNO = #{fno,jdbcType=NUMERIC}
+        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
     </select>
 
 <!--    플리마켓 게시글 삭제-->
@@ -117,7 +143,7 @@
         DELETE FROM
                    FLEAMARKET
                WHERE
-                   FNO = #{fno,jdbcType=NUMERIC};
+                   POST_ID = #{post_id,jdbcType=NUMERIC};
     </delete>
 
 <!--    플리마켓 게시글의 파일 삭제-->
@@ -125,19 +151,19 @@
         DELETE FROM
                    FLEAMARKET_FILES
                WHERE
-                   FNO = #{fno,jdbcType=NUMERIC};
+                   POST_ID = #{post_id,jdbcType=NUMERIC};
     </delete>
 <!--    게시글 업데이트-->
     <update id="upt_FleaMarket" parameterType="FleamarketDto">
         UPDATE FLEAMARKET
         SET  TITLE = #{title,jdbcType=VARCHAR},
              CONTENT = #{content,jdbcType=VARCHAR},
-             ADDRESS = #{address,jdbcType=VARCHAR},
-             DETAILADDRESS = #{detailAddress,jdbcType=VARCHAR},
-             APPROVALCNT = #{approvalCnt,jdbcType=NUMERIC},
-             ENDDATE = date_format(#{endDate,jdbcType=VARCHAR},'%Y-%m-%d'),
-             UPTDATE = date_format(sysdate(),'%Y-%m-%d')
-        WHERE FNO = #{fno,jdbcType=NUMERIC}
+             LOCATION = #{location,jdbcType=VARCHAR},
+             SUB_LOCATION = #{sub_location,jdbcType=VARCHAR},
+             MAX_APPLICANTS = #{max_applicants,jdbcType=NUMERIC},
+             END_DATE = date_format(#{end_date,jdbcType=VARCHAR},'%Y-%m-%d'),
+             UPT_DATE = date_format(sysdate(),'%Y-%m-%d')
+        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
     </update>
 
 <!-- 신청 등록   -->
@@ -145,8 +171,8 @@
         INSERT INTO
             APPLICATION_FM VALUES (
                  0,  -- 신청번호
-                 #{fno,jdbcType=NUMERIC},
-                 #{userno,jdbcType=VARCHAR},
+                 #{post_id,jdbcType=NUMERIC},
+                 #{user_id,jdbcType=VARCHAR},
                  SYSDATE(),
                 '대기'
             )
@@ -159,34 +185,34 @@
         from
             APPLICATION_FM
         WHERE
-            FNO = #{fno,jdbcType=NUMERIC}
+            POST_ID = #{post_id,jdbcType=NUMERIC}
         AND
-            USERNO = #{userno,jdbcType=VARCHAR}
+            USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
 
         <!-- 게시글 삭제시 신청글도 삭제 -->
     <delete id="del_Application_FM" parameterType="_int">
         DELETE
         FROM APPLICATION_FM
-        WHERE FNO = #{fno,jdbcType=NUMERIC}
+        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
     </delete>
 
 <!--    특정 fno(글번호)에 대해 신청자(승인/대기/거절) 인원들고오기-->
     <select id="get_application_FM" parameterType="Application_FM" resultType="Application_FM">
         SELECT
-            AF.USERNO,
-            AF.REGDATE,
+            AF.USER_ID,
+            AF.REG_DATE,
             CM.NAME,
             CM.EMAIL,
             CM.ADDRESS,
-            CM.PHONENUMBER
+            CM.PHONE_NUMBER
         FROM
             APPLICATION_FM AS AF
         INNER JOIN
-                CTG_MEMBER AS CM ON AF.USERNO = CM.USERNO
+                CTG_MEMBER AS CM ON AF.USER_ID = CM.USER_ID
         WHERE
-            AF.FNO = #{fno,jdbcType=NUMERIC}
-          AND AF.STATE = #{state,jdbcType=VARCHAR};
+            AF.POST_ID = #{post_id,jdbcType=NUMERIC}
+          AND AF.STATE = #{state,jdbcType=VARCHAR}
     </select>
 
     <!-- 신청한 회원의 상태값 변경(수락/거절/대기)   -->
@@ -194,9 +220,9 @@
         UPDATE APPLICATION_FM SET
             STATE = #{state,jdbcType=VARCHAR}
         WHERE
-            FNO = #{fno,jdbcType=NUMERIC}
+            POST_ID = #{post_id,jdbcType=NUMERIC}
           AND
-            USERNO = #{userno,jdbcType=VARCHAR}
+            USER_ID = #{user_id,jdbcType=VARCHAR}
     </update>
 
 <!--    현재승인인원 수-->
@@ -206,7 +232,7 @@
         FROM
             APPLICATION_FM
         WHERE
-            FNO = #{fno,jdbcType=NUMERIC}
+            POST_ID = #{post_id,jdbcType=NUMERIC}
           AND
             STATE = '승인'
     </select>
@@ -216,9 +242,9 @@
         UPDATE
             FLEAMARKET
         SET
-            CURCNT = #{count,jdbcType=NUMERIC}
+            CURRENT_COUNT = #{count,jdbcType=NUMERIC}
         WHERE
-            FNO = #{fno,jdbcType=NUMERIC}
+            POST_ID = #{post_id,jdbcType=NUMERIC}
     </update>
 
     <!-- 내가 쓴 플리마켓 갯수 -->
@@ -228,7 +254,7 @@
         FROM
             FLEAMARKET
         WHERE
-            USERNO = #{userno,jdbcType=VARCHAR}
+            USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
 
 <!--내가 쓴 플리마켓글 조회-->
@@ -236,13 +262,24 @@
 
         SELECT * FROM (
                   SELECT
-                      (@ROWNUM := @ROWNUM + 1) as ROWNUM, F.*
+                      (@ROWNUM := @ROWNUM + 1) as ROWNUM,
+                      F.POST_ID,
+                      CASE WHEN
+                               LENGTH(F.TITLE) > 50
+                               THEN
+                               CONCAT(LEFT(F.TITLE, 50), '...')
+                           ELSE
+                               F.TITLE END
+                          AS TITLE,
+                      SUBSTRING_INDEX(F.LOCATION, ' ', 2) AS LOCATION,
+                      F.MAX_APPLICANTS,
+                      F.CURRENT_COUNT
                   FROM
                       (SELECT @ROWNUM := 0) r, FLEAMARKET AS F
                   WHERE
-                      F.USERNO = #{userno,jdbcType=VARCHAR}
+                      F.USER_ID = #{user_id,jdbcType=VARCHAR}
                   ORDER BY
-                      FNO
+                      POST_ID
               ) AS T
         WHERE
             ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
@@ -254,9 +291,9 @@
         FROM
             APPLICATION_FM
         WHERE
-            USERNO = #{userno,jdbcType=VARCHAR}
+            USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
-
+<!--내가 신청한 플리마켓 리스트-->
     <select id="get_My_Application" parameterType="FleamarketDto" resultType="FleamarketDto">
         <![CDATA[
         SELECT * from
@@ -264,14 +301,20 @@
                  (@ROWNUM := @ROWNUM + 1) as ROWNUM,T.*
              FROM
                (SELECT
-                    F.FNO,
-                    F.TITLE,
-                    F.ADDRESS,
-                    F.CURCNT,
-                    F.APPROVALCNT,
+                    F.POST_ID,
+                    CASE WHEN
+                             LENGTH(F.TITLE) > 50
+                             THEN
+                             CONCAT(LEFT(F.TITLE, 50), '...')
+                         ELSE
+                             F.TITLE END
+                        AS TITLE,
+                    SUBSTRING_INDEX(F.LOCATION, ' ', 2) AS LOCATION,
+                    F.CURRENT_COUNT,
+                    F.MAX_APPLICANTS,
                     A.STATE,
                     CASE WHEN
-                         STR_TO_DATE(F.ENDDATE, '%Y-%m-%d') < CURDATE()
+                         STR_TO_DATE(F.END_DATE, '%Y-%m-%d') < CURDATE()
                      THEN '모집종료'
                      ELSE '모집중'
                      END AS FSTATE
@@ -280,11 +323,11 @@
                  INNER JOIN
                     FLEAMARKET F
                  ON
-                    A.FNO = F.FNO
+                    A.POST_ID = F.POST_ID
                  WHERE
-                    A.USERNO = #{userno,jdbcType=VARCHAR}
+                    A.USER_ID = #{user_id,jdbcType=VARCHAR}
                  ORDER BY
-                     FNO
+                    POST_ID
                  ) AS T,
             (SELECT @ROWNUM:=0) r) AS a
         where ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} and #{en_rownum,jdbcType=NUMERIC}

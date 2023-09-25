@@ -7,6 +7,7 @@ import com.project.sample.dto.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,16 +29,13 @@ public class MemberServiceImp implements MemberService {
     //이메일 중복검사
     @Override
     public int Check_SignUp_email(String email) {
-
         return dao.Check_SignUp_email(email);
     }
 
     //사업자번호 중복검사
     @Override
     public int BN_Check(Member member) {
-
-        member.setB_no(aes.encrypt(member.getB_no()));
-
+        member.setBusiness_number(aes.encrypt(member.getBusiness_number()));
         return dao.BN_Check(member);
     }
 
@@ -45,7 +43,8 @@ public class MemberServiceImp implements MemberService {
     @Override
     public int Ins_Ctg_Member(Member member) throws IllegalAccessException {
         //사업자도 추가해야함..
-//
+
+        member.set_business(member.getBusiness_number() != null);
 
         // Member 클래스 모든 필드를 가져 옴
         Field[] fields = member.getClass().getDeclaredFields();
@@ -70,19 +69,26 @@ public class MemberServiceImp implements MemberService {
                     // getter로 호출하여 현재 문자열 필드의 원래 값을 얻습니다.
                     String originalValue = (String) getter.invoke(member);
 
-                    String newValue;
+                    //값이 NULL이 아닐경우
+                    boolean NullCheck = originalValue != null;
 
                     // 현재 문자열이 password라면 executeMethodA 실행, 그렇지 않다면 executeMethodB 실행
-                    if ("password".equals(fieldName)) {
-                        newValue =  aes.hashBcrypt(originalValue);
-                        System.out.println("Bcrypt : "+methodName+" : " + newValue);
-                    } else {
-                        newValue = aes.encrypt(originalValue);
-                        System.out.println("AES Encrypt : "+methodName+" : " + newValue);
-                    }
+                    if(NullCheck){
 
+                        String newValue;
+
+                        if ("password".equals( fieldName )) {
+                            newValue =  aes.hashBcrypt(originalValue);
+                            System.out.println("Bcrypt : "+methodName+" : " + newValue);
+                        } else {
+                            newValue = aes.encrypt(originalValue);
+                            System.out.println("AES Encrypt : "+methodName+" : " + newValue);
+                        }
+                        setter.invoke(member, newValue);
+
+                    }
                     // setter 메소들르 호출하여 현재 문자열필트에 새로운 값을 설정합니다.
-                    setter.invoke(member, newValue);
+
 
                 } catch (NoSuchMethodException e) {
                     // 해당하는 메서도가 없는 경우 처리
@@ -96,33 +102,24 @@ public class MemberServiceImp implements MemberService {
                 }
             }
         }
-        //잘 처리되었는지 확인용
-//        for (Field field : member.getClass().getDeclaredFields()) {
-//            field.setAccessible(true);
-//            System.out.println(field.getName()+":"+field.get(member));
-//        }
-
         //DB에 저장
-
-
         return dao.Ins_Ctg_Member(member);
-        //return 0;
     }
 
     //로그인
     @Override
-    public Member SignIn_Ctg_Member(Member member) {
+    public String SignIn_Ctg_Member(Member member) {
 
-        System.out.println("LOGIN EMAIL : "+member.getEmail());
-        System.out.println("LOGIN PWD : "+member.getPassword());
-
-
+        //암호화된 이메일과 비교해야하기 때문에 들어온 이메일 암호화 처리
+        //이후 DB들어가기전 세팅
         member.setEmail(aes.encrypt(member.getEmail()));
 
+        //데이터 불러오기
         Member memberInfo = dao.SignIn_Ctg_Member(member);
+        String user_id;
 
         //회원 정보가 존재할경우
-        if(memberInfo.getUserno() != null){
+        if(memberInfo.getUser_id() != null){
             //평문 pwd와 암호화 pwd비교
             String Origin_pwd = member.getPassword();
             String Hash_pwd = memberInfo.getPassword();
@@ -130,17 +127,21 @@ public class MemberServiceImp implements MemberService {
 
             //일치한다면 이름/이메일 복호화하고 재할당
             if(pwdCheck){
-                memberInfo.setName(aes.decrypt(memberInfo.getName()));
-                memberInfo.setEmail(aes.decrypt(memberInfo.getEmail()));
+                //memberInfo.setName(aes.decrypt(memberInfo.getName()));
+                //memberInfo.setEmail(aes.decrypt(memberInfo.getEmail()));
+                memberInfo.setEmail(null);
                 memberInfo.setPassword(null);
+                user_id = memberInfo.getUser_id();
             }else{
-                memberInfo = null;
+               // memberInfo = null;
+                user_id = null;
             }
         }else{
-            memberInfo = null;
+            //memberInfo = null;
+            user_id = null;
         }
 
-        return memberInfo;
+        return user_id;
     }
 
 

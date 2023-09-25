@@ -1,5 +1,6 @@
 package com.project.sample.common;
 
+import com.project.sample.dao.MemberDao;
 import com.project.sample.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -18,9 +19,14 @@ public class SampleInterceptor implements HandlerInterceptor {
 
     @Autowired
     private final JwtService jwtservice;
+    @Autowired
+    private final MemberDao memberDao;
 
-    public SampleInterceptor(JwtService jwtservice) {
+    public SampleInterceptor(JwtService jwtservice,MemberDao memberDao) {
+
         this.jwtservice = jwtservice;
+        this.memberDao = memberDao;
+
     }
 
     //Controller실행되기 이전
@@ -28,24 +34,32 @@ public class SampleInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         System.out.println("Interceptor preHandle Uri : "+ request.getRequestURI());
         //세션 확인
-        HttpSession session = request.getSession();
-        System.out.println(session.getAttribute("member"));
+        //HttpSession session = request.getSession();
+        //System.out.println(session.getAttribute("user_id"));
+
+        //로그아웃상태 == 쿠키가 없을 때 접근 못하게 하기위해
+        boolean check_token = false;
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
+                    //로그아웃 상태에서 쿠키가 없을때 대비
+                    check_token = true;
+
                     String token = cookie.getValue();
                     System.out.println("preHandle token Value: "+token);
                     // JWT 라이브러리를 사용하여 토큰 검증 및 데이터 추출
                     try {
                         Claims claims = jwtservice.getClaims(token);
+                        //System.out.println("claims is empty? : "+claims.isEmpty());
+                        String user_id = (String) claims.get("user_id");
+                        //boolean is_business = (boolean) claims.get("_business");
 
-                        String email = (String) claims.get("email");
-                        boolean is_business = (boolean) claims.get("_business");
+                        System.out.println("userid : "+user_id);
 
-                        System.out.println("preHandle token's email Value : "+ email);
-                        System.out.println("preHandle token's email Value : "+ is_business);
+                        boolean is_business = memberDao.is_business(user_id);
+                        System.out.println(is_business);
                         // 필요한 권한 확인
                         if (!is_business) {
                             response.sendError(HttpServletResponse.SC_FORBIDDEN, "권한이 없습니다!");
@@ -61,32 +75,14 @@ public class SampleInterceptor implements HandlerInterceptor {
                 }
             }
         }
+        if(!check_token){
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "로그인 후 이용하시기 바랍니다.");
+            return false;
+        }
 
         return true;
 
     }
-
-//    @Override
-//    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-//            throws Exception {
-//
-//        String requestURI = request.getRequestURI();
-//        System.out.println("[interceptor] : " + requestURI);
-//        HttpSession session = request.getSession(false);
-//
-//        if(session == null || session.getAttribute(SessionConst.LOGIN_MEMBER) == null) {
-//            // 로그인 되지 않음
-//            System.out.println("[미인증 사용자 요청]");
-//
-//            //로그인으로 redirect
-//            response.sendRedirect("/login?redirectURL=" + requestURI);
-//            return false;
-//        }
-//        // 로그인 되어있을 떄
-//        return true;
-//    }
-
-
 
 
 

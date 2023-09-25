@@ -20,7 +20,7 @@
         FROM
             CTG_MEMBER
         WHERE
-            B_NO = #{b_no,jdbcType=VARCHAR}
+            BUSINESS_NUMBER = #{business_number,jdbcType=VARCHAR}
     </select>
 
 <!--    회원가입 -->
@@ -33,44 +33,43 @@
             #{email,jdbcType=VARCHAR},
             #{password,jdbcType=VARCHAR},
             #{name,jdbcType=VARCHAR},
-            #{phoneNumber,jdbcType=VARCHAR},
-            #{postcode,jdbcType=NUMERIC},
+            #{phone_number,jdbcType=VARCHAR},
+            #{postal_code,jdbcType=NUMERIC},
             #{address,jdbcType=NUMERIC},
-            <choose>
-                <when test="extraAddress!=null"> #{extraAddress,jdbcType=NUMERIC},</when>
-                <otherwise>NULL,</otherwise>
-            </choose>
-            #{detailAddress,jdbcType=NUMERIC},
-            #{bnCheck,jdbcType=NUMERIC},
+            #{extra_address,jdbcType=NUMERIC},
+            #{detail_address,jdbcType=NUMERIC},
+            #{is_business,jdbcType=BIT},
             TRUE,
             SYSDATE(),
             NULL,
-            <choose>
-                <when test="bnCheck == true">
-                    #{b_no,jdbcType=VARCHAR}
-                </when>
-                <otherwise>
-                    NULL
-                </otherwise>
-            </choose>
-
+            #{business_number,jdbcType=VARCHAR},
+            NULL
         );
     </insert>
 
 <!--  로그인 시, 정보  -->
     <select id="SignIn_Ctg_Member" parameterType="Member" resultType="Member">
         SELECT
-            USERNO,
-            NAME,
+            USER_ID,
+           # NAME,
             EMAIL,
-            PASSWORD,
-            BNCHECK
+            PASSWORD
+           # IS_BUSINESS
         FROM
             CTG_MEMBER
         WHERE
-            STATE = 1
+            IS_ACTIVE = 1
         AND
             EMAIL = #{email,jdbcType=VARCHAR}
+    </select>
+
+    <select id="is_business" parameterType="String" resultType="_boolean">
+        SELECT
+            IS_BUSINESS
+        FROM
+            CTG_MEMBER
+        WHERE
+            USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
 
 

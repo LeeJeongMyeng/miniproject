@@ -30,6 +30,10 @@ public class FleamarketController {
         this.service = service;
     }
 
+
+
+
+
     //플리마켓 게시글 등록
     @PostMapping("/ctg/reg_FleaMarket")
     public int reg_FleaMarket(@RequestPart(value = "files", required = false) List<MultipartFile> files,
@@ -41,66 +45,44 @@ public class FleamarketController {
         // JSON 형태를 FleaMarketDto객체로 변환
         ObjectMapper objectMapper = new ObjectMapper();
         FleamarketDto fleamarketDto = objectMapper.readValue(fleamarketDtoStr, FleamarketDto.class);
-        // 등록 or 수정 후 fno 받아옴
-        int fno = service.reg_FleaMarket(fleamarketDto, method);
-        //System.out.println(files != null && !files.isEmpty());
-        // MultipartFile 데이터가 존재하는 경우에만 파일 등록을 실행
-        if (files != null && !files.isEmpty()) {
-            service.reg_FleaMarket_files(files, fno, method);
-        }
-        return 0;
+
+        return service.reg_FleaMarket(fleamarketDto,files, method);
     }
 
     // 메인화면 게시글 리스트+ 썸네일 사진 하나씩
     @PostMapping("/ctg/get_FleaMarket_List")
-    public Map<String,Object> get_FleaMarket_List(@RequestBody FleamarketDto fleamarketDto){
+    public FleaMarketDto2 get_FleaMarket_List(@RequestBody FleamarketDto fleamarketDto){
 
         System.out.println("플리마켓 게시글 리스트 조회(/ctg/get_FleaMarket_List) 실행");
 
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put("FleamarketList",service.get_FleaMarket_List(fleamarketDto));
-
-        return map;
+        return service.get_FleaMarket_List(fleamarketDto);
     }
 
     //플리마켓 상세조회
     @GetMapping("/ctg/get_FleaMarket")
-    public Map<String,Object> get_FleaMarket(@RequestParam int fno){
+    public Map<String,Object> get_FleaMarket(@RequestParam int post_id){
 
         System.out.println("플리마켓 상세조회(/ctg/get_FleaMarket) 실행");
 
-        Map<String,Object> map = new HashMap<String,Object>();
-        //게시글정보
-       map.put("FleaMarket",service.get_FleaMarket(fno));
-       //게시글 이미지 사진정보
-       map.put("FleaMarket_files",service.get_FleaMarket_files(fno));
-
-        return map;
+        return service.get_FleaMarket(post_id);
     }
 
     //플리마켓 게시글 삭제
     @GetMapping("/ctg/del_FleaMarket")
-    public int del_FleaMarket(@RequestParam int fno){
+    public int del_FleaMarket(@RequestParam int post_id){
 
         System.out.println("플리마켓 게시글 삭제(/ctg/del_FleaMarket) 실행");
-        System.out.println("삭제Con");
-        return service.del_FleaMarket(fno);
+
+        return service.del_FleaMarket(post_id);
     }
 
     //특정 플리마켓 게시글에 대해 신청하기
     @GetMapping("/ctg/application_FM")
-    public int application_FM(@RequestParam int fno,@RequestParam String userno){
+    public int application_FM(@RequestParam int post_id,@RequestParam String user_id){
 
         System.out.println("플리마켓 신청(/ctg/application_FM) 실행");
-        int Successnum = 0;
-        //중복검사
-        int Checknum = service.Check_Application(fno,userno);
-        System.out.println(Checknum);
-        //신청 진행
-        if(Checknum==0){
-           Successnum =  service.application_FM(fno, userno);
-        }
-        return Successnum;
+
+        return  service.application_FM(post_id, user_id);
     }
 
 
@@ -119,21 +101,14 @@ public class FleamarketController {
     public int upt_application_FM(@RequestBody Application_FM applicationFm) {
 
         System.out.println("신청 결과 업데이트(/ctg/upt_application_FM) 실행");
-            //상태수정
-           int result = service.upt_application_FM(applicationFm);
-           if(result==1){
-               //승인인원 재할당
-               result =service.upt_apl_FM_ACount(applicationFm);
-           }
-        //데이터 가져오기
-        return result;
+
+        return service.upt_application_FM(applicationFm);
     }
     //내가 쓴 플리마켓 조회
     @PostMapping("/ctg/get_My_FleaMarket")
     public FleaMarketDto2 get_My_FleaMarket(@RequestBody FleamarketDto fleamarketDto){
 
         System.out.println("내가 쓴 플리마켓 게시글 조회(/ctg/get_My_FleaMarket) 실행");
-        ObjectMapper objectMapper = new ObjectMapper();
 
         return service.get_My_FleaMarket(fleamarketDto);
     }

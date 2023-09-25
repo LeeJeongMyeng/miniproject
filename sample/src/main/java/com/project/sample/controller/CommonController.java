@@ -30,15 +30,7 @@ public class CommonController {
 
     @Value("${fileDownloadPath}")
     private String fileDownloadPath;
-
-
     //String fileDownloadPath ="C:\\pandora3\\workspace\\pandora3\\WebContent\\resources\\files\\ctg\\";
-
-    private final NoticService service;
-    @Autowired
-    public CommonController(NoticService service) {
-        this.service = service;
-    }
 
     //파일다운로드(공지사항 첨부파일)
     @GetMapping("/ctg/filedownload")
@@ -64,6 +56,12 @@ public class CommonController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/ctg/check-user-bn")
+    public  ResponseEntity<?> checkUserBN() {
+        // 실제 비즈니스 로직으로 권한 확인 및 데이터 반환을 수행하고 결과를 반환합니다.
+        return ResponseEntity.ok(true);
     }
 
 

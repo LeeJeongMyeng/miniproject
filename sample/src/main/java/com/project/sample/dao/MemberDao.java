@@ -11,4 +11,5 @@ public interface MemberDao {
     public int BN_Check(Member member);
     public Member Ins_Ctg_Member_bs(Member member);
     public Member SignIn_Ctg_Member(Member member);
+    public boolean is_business(String user_id);
 }
