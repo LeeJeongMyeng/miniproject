@@ -1,4 +1,4 @@
-package com.project.sample.service;
+package com.project.sample.common;
 
 import io.jsonwebtoken.Claims;
 

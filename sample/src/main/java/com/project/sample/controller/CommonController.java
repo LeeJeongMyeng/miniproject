@@ -2,13 +2,8 @@ package com.project.sample.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.sample.dto.FileDto;
-import com.project.sample.dto.Notic;
-import com.project.sample.service.JwtService;
-import com.project.sample.service.MemberService;
-import com.project.sample.service.NoticService;
+import com.project.sample.common.JwtService;
 import io.jsonwebtoken.Claims;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -17,17 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 //게시글관련 컨트롤러
 @Controller
@@ -70,7 +58,7 @@ public class CommonController {
     }
 
     //토큰 확인하기
-    @GetMapping("/ctg/account_check")
+    @RequestMapping("/ctg/account_check")
     public ResponseEntity account_check(@CookieValue(value = "token",required = false) String token){
         System.out.println("토근 존재유무(/ctg/account_check) 실행");
         Claims claims =  jwtService.getClaims(token);
@@ -83,11 +71,12 @@ public class CommonController {
         }
     }
 
-    @PostMapping("/ctg/check-user-bn")
+    @RequestMapping("/ctg/check-user-bn")
     public  ResponseEntity<?> checkUserBN() {
         // 실제 비즈니스 로직으로 권한 확인 및 데이터 반환을 수행하고 결과를 반환합니다.
         return ResponseEntity.ok(true);
     }
+
 
 
 

@@ -1,12 +1,9 @@
 package com.project.sample.controller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.sample.dto.Member;
-import com.project.sample.service.JwtService;
-import com.project.sample.service.JwtServiceImp;
+import com.project.sample.common.JwtService;
 import com.project.sample.service.MemberService;
-import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

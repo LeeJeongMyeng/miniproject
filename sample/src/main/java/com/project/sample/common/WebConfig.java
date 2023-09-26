@@ -1,7 +1,6 @@
 package com.project.sample.common;
 
 import com.project.sample.dao.MemberDao;
-import com.project.sample.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

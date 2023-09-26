@@ -1,18 +1,17 @@
 package com.project.sample.common;
 
 import com.project.sample.dao.MemberDao;
-import com.project.sample.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Component
@@ -31,7 +30,7 @@ public class SampleInterceptor implements HandlerInterceptor {
     }
 
     private static final String UNAUTHORIZED_MESSAGE = "만료된 토큰입니다.";
-    private static final String FORBIDDEN_MESSAGE = "권한이 없습니다!";
+    private static final String FORBIDDEN_MESSAGE = "사업자 회원만 이용이 가능합니다.";
     private static final String LOGIN_REQUIRED_MESSAGE = "로그인 후 이용하시기 바랍니다.";
 
 
@@ -58,21 +57,24 @@ public class SampleInterceptor implements HandlerInterceptor {
     private boolean validateToken(HttpServletResponse response, String token) throws IOException {
         try {
             Claims claims = jwtservice.getClaims(token);
-
+            System.out.println("/ctg/check-user-bn :실행");
             String user_id = (String) claims.get("user_id");
             if(user_id == null){
                 throw new NullPointerException();
             }
 
             boolean is_business = memberDao.is_business(user_id);
-
+            System.out.println(is_business);
             if (!is_business) {
+                System.out.println("is_business?");
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, FORBIDDEN_MESSAGE);
+                System.out.println("is_business2?");
                 return false;
             }
-
+            //토큰이 유효하지않을때
         } catch (JwtException | NullPointerException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 후 이용하시기 바랍니다.");
+            System.out.println("JwtException?");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, LOGIN_REQUIRED_MESSAGE);
             return false;
         }
 

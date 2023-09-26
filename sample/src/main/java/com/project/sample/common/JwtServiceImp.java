@@ -1,8 +1,7 @@
-package com.project.sample.service;
+package com.project.sample.common;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -24,7 +23,7 @@ public class JwtServiceImp implements JwtService{
 
         Date expTime = new Date();
         //토큰의 유효시간 millisecond기준 => 5분
-        expTime.setTime(expTime.getTime()+ 1000*60*1);
+        expTime.setTime(expTime.getTime()+ 1000*60*30);
         //key를 byte로 변환
         System.out.println(secretkey);
         byte[] secretkeyByte = DatatypeConverter.parseBase64Binary(secretkey);
