@@ -47,25 +47,47 @@
         );
     </insert>
 
-<!--  로그인 시, 정보  -->
+<!--  로그인or내정보 조회시 정보  -->
     <select id="SignIn_Ctg_Member" parameterType="Member" resultType="Member">
         SELECT
-            USER_ID,
-           # NAME,
-            EMAIL,
-            PASSWORD
-           # IS_BUSINESS
+        USER_ID,
+        PASSWORD,
+
+        <if test="method == 'MyInfo'">
+            NAME,
+            IS_BUSINESS,
+            PHONE_NUMBER,
+            ADDRESS,
+            JOIN_DATE,
+        </if>
+
+        EMAIL
         FROM
-            CTG_MEMBER
+        CTG_MEMBER
         WHERE
-            IS_ACTIVE = 1
-        AND
-            EMAIL = #{email,jdbcType=VARCHAR}
+        IS_ACTIVE = 1
+
+        <if test="method == 'Login'">
+            AND EMAIL = #{email,jdbcType=VARCHAR}
+        </if>
+
+        <if test="method == 'MyInfo'">
+            AND USER_ID = #{user_id,jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="is_business" parameterType="String" resultType="_boolean">
         SELECT
             IS_BUSINESS
+        FROM
+            CTG_MEMBER
+        WHERE
+            USER_ID = #{user_id,jdbcType=VARCHAR}
+    </select>
+    
+    <select id="Check_Password"  parameterType="String" resultType="String">
+        SELECT
+            PASSWORD
         FROM
             CTG_MEMBER
         WHERE

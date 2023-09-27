@@ -4,6 +4,7 @@ package com.project.sample.controller;
 import com.project.sample.dto.Member;
 import com.project.sample.common.JwtService;
 import com.project.sample.service.MemberService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,6 +98,20 @@ public class MemberController {
         res.addCookie(cookie);
 
         return new ResponseEntity<>(null,HttpStatus.OK);
+    }
+
+    //내정보조회(회원정보,본인작성글,본인 신청글)
+    @PostMapping("/ctg/get_My_Info")
+    public Member get_My_Info(@RequestBody Member member) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        System.out.println("/ctg/get_My_Info 실행");
+        return service.get_My_Info(member);
+    }
+
+    @PostMapping("/ctg/Check_Password")
+    public boolean Check_Password(@RequestBody Member member){
+        System.out.println(member.getUser_id());
+        System.out.println(member.getPassword());
+        return service.Check_Password(member);
     }
 
 }

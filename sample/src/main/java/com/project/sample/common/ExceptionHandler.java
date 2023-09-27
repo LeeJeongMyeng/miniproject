@@ -31,12 +31,17 @@ public class ExceptionHandler {
         }
 
         // 다른 상태 코드 처리...
+
         throw ex; // 예상치 못한 상태 코드는 다시 던져서 Spring의 기본 에러 핸들러가 처리하게 함.
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> handleNullPointerException(NullPointerException ex) {
+        return new ResponseEntity<>("Null 값이 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle500(Exception ex) {
         return new ResponseEntity<>("에러발생(500)", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }

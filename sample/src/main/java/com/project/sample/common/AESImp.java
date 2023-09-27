@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Base64;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -26,11 +29,32 @@ public class AESImp implements AES{
 
 
     //암호화이전 field작업
-    public Object MakeFeild(){
+    public Object get_Origin_Info(Object a) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // 필드명을 가져옴  맨앞글자 대문자+맨앞글자제외문자 => Name,Eamil
+        Field[] fields = a.getClass().getDeclaredFields();
+        for ( Field field : fields ) {
+            //private혹은 projected 필드에 접근할 수 있도록 허용
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            //복호화가 필요없는 컬럼이 아닐경우
+            if( fieldName.equals("name") || fieldName.equals("address") || fieldName.equals("phone_number") ||fieldName.equals("email")){
+                //set/get을 위해 field이름의 앞글자를 대문자로 전환
+                String methodName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
+                // 현재 필드의 get+methodName으로 getter호출
+                Method getter = a.getClass().getMethod("get" + methodName);
+                // 현재 필드의 setter 호출
+                Method setter = a.getClass().getMethod("set" + methodName, String.class);
+                // getter로 호출하여 현재 문자열 필드의 암호화값을 얻음
+                String EncValue = (String) getter.invoke(a);
+                //복호화
+                String  Originvalue = decrypt(EncValue);
+                //평문세팅
+                setter.invoke(a,Originvalue);
+            }
+        }
 
 
-
-        return 0;
+        return a;
     }
 
     //AES양방향 암호화

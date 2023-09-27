@@ -3,6 +3,8 @@ package com.project.sample.service;
 import com.project.sample.common.AESImp;
 import com.project.sample.dao.FleamarketDao;
 import com.project.sample.dao.MemberDao;
+import com.project.sample.dto.FleaMarketDto2;
+import com.project.sample.dto.FleamarketDto;
 import com.project.sample.dto.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -38,6 +41,8 @@ public class MemberServiceImp implements MemberService {
         member.setBusiness_number(aes.encrypt(member.getBusiness_number()));
         return dao.BN_Check(member);
     }
+
+
 
     //회원가입
     @Override
@@ -113,7 +118,7 @@ public class MemberServiceImp implements MemberService {
         //암호화된 이메일과 비교해야하기 때문에 들어온 이메일 암호화 처리
         //이후 DB들어가기전 세팅
         member.setEmail(aes.encrypt(member.getEmail()));
-
+        member.setMethod("Login");
         //데이터 불러오기
         Member memberInfo = dao.SignIn_Ctg_Member(member);
         String user_id;
@@ -144,7 +149,38 @@ public class MemberServiceImp implements MemberService {
         return user_id;
     }
 
+    @Override
+    public Member get_My_Info(Member member)
+            throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
 
+        //회원정보들오고는 mapper에서 if문용
+        member.setMethod("MyInfo");
+        //1.회원 정보 들고오기
+        Member memberInfo = dao.SignIn_Ctg_Member(member);
+        //비밀번호는 필요없으니까 null
+        memberInfo.setPassword(null);
+
+            //복호화 처리
+        memberInfo = (Member) aes.get_Origin_Info(memberInfo);
+
+        //데이터 별처리
+        memberInfo.setName(aes.ProtectName(memberInfo.getName()));
+        memberInfo.setEmail(aes.ProtectEmail(memberInfo.getEmail()));
+        memberInfo.setPhone_number(aes.ProtectPhoneNumber(memberInfo.getPhone_number()));
+        memberInfo.setAddress(aes.Protectaddress(memberInfo.getAddress()));
+
+
+        return memberInfo;
+//        return null;
+    }
+
+    @Override
+    public boolean Check_Password(Member member) {
+
+        String EncPassword = dao.Check_Password(member.getUser_id());
+
+        return aes.checkBcrypt(member.getPassword(),EncPassword);
+    }
 
 
 }

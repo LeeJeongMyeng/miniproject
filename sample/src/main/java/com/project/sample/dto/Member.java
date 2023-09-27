@@ -18,8 +18,10 @@ public class Member {
     private String detail_address; //상세주소
     private boolean is_business; //사업자유무
     private boolean is_active; //가입상태
-    private Date join_date; //가입일자
-    private Date leave_date; //탈퇴일자
+    private String join_date; //가입일자
+    private String leave_date; //탈퇴일자
     //데이터베이스에서는 사업자 유무를 가지고 판단후에 사업자 번호확인하는 식으로 진행하자
     private String business_number; //사업자번호
+
+    private String Method; //정보 들고올때 선택지
 }

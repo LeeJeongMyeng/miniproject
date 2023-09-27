@@ -205,30 +205,7 @@ public class FleamarketServiceImp implements FleamarketService {
 
             //복호화처리(유저정보List -> 복호화할 Field선정 -> 복호화 ->setter호출)
             for( Application_FM a : applicationFmList ){
-
-                // 필드명을 가져옴  맨앞글자 대문자+맨앞글자제외문자 => Name,Eamil
-                Field[] fields = a.getClass().getDeclaredFields();
-                for ( Field field : fields ) {
-                    //private혹은 projected 필드에 접근할 수 있도록 허용
-                    field.setAccessible(true);
-                    String fieldName = field.getName();
-                    //복호화가 필요없는 컬럼이 아닐경우
-                    if( fieldName.equals("name") || fieldName.equals("address") || fieldName.equals("phone_number") ||fieldName.equals("email")){
-                        //set/get을 위해 field이름의 앞글자를 대문자로 전환
-                        String methodName = field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);
-                        // 현재 필드의 get+methodName으로 getter호출
-                        Method getter = a.getClass().getMethod("get" + methodName);
-                        // 현재 필드의 setter 호출
-                        Method setter = a.getClass().getMethod("set" + methodName, String.class);
-                        // getter로 호출하여 현재 문자열 필드의 암호화값을 얻음
-                        String EncValue = (String) getter.invoke(a);
-                        //복호화
-                        String  Originvalue = aes.decrypt(EncValue);
-                        //평문세팅
-                        setter.invoke(a,Originvalue);
-                    }
-                }
-
+               a= (Application_FM) aes.get_Origin_Info(a);
             }
 
             //개인정보 일부 가리기
@@ -243,8 +220,6 @@ public class FleamarketServiceImp implements FleamarketService {
                 a.setAddress(aes.Protectaddress(a.getAddress()));
             }
 
-            //할당
-            //states_mapname = {"wait","approval","reject"}
             map.put( states_mapname[i] + "_appliication_FM" , applicationFmList );
         }
 
