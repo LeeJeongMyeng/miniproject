@@ -32,11 +32,11 @@ public class NoticController {
 
     //공지사항 상세조회
     @GetMapping("/ctg/get_Notic")
-    public Map<String, Object> get_Notic( @RequestParam int ntno ){
+    public Map<String, Object> get_Notic( @RequestParam int notice_id ){
 
         System.out.println("공지사항 상세조회(/ctg/get_Notic) 실행");
 
-        return service.get_Notic(ntno);
+        return service.get_Notic(notice_id);
     }
 
 

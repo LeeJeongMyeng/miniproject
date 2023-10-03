@@ -12,5 +12,7 @@ public interface MemberDao {
     public Member Ins_Ctg_Member_bs(Member member);
     public Member SignIn_Ctg_Member(Member member);
     public boolean is_business(String user_id);
-    public String Check_Password(String user_id);
+    public String Check_Password(Member member);
+    int MyInfo_Update(Member member);
+    int delete_Member(Member member);
 }

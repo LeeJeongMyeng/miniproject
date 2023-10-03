@@ -7,7 +7,10 @@
 
     <!-- 공지사항 갯수 확인(페이징용) -->
     <select id="get_Notic_Count" parameterType="Notic" resultType="_int">
-        SELECT COUNT(*) FROM CTG_NOTIC
+        SELECT
+            COUNT(*)
+        FROM
+            CTG_NOTIC
         WHERE
         <choose>
             <when test="Search_Mode == 3"> <!-- 내용만검색 -->
@@ -36,7 +39,8 @@
                 REG_DATE,
                 UPT_DATE,
                 END_DATE
-            FROM CTG_NOTIC
+            FROM
+                CTG_NOTIC
             WHERE
             <choose>
                 <when test="Search_Mode == 3"> <!-- 내용만검색 -->
@@ -51,10 +55,13 @@
             </choose>
             LIKE
                 CONCAT('%',#{title,jdbcType=VARCHAR},'%')
-            AND IS_STATE = 1
+            AND
+                IS_STATE = 1
             ORDER BY IS_IMPORTANT DESC) AS N,(SELECT @rownum := 0) r <!-- 중요여부순으로 ORDER BY하고 ROWNUM적용 -->
-        HAVING ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
-        ORDER BY ROWNUM
+        HAVING
+            ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
+        ORDER BY
+            ROWNUM
     </select>
 
     <select id="get_Notic" parameterType="_int" resultType="Notic">
@@ -64,8 +71,10 @@
             CONTENT,
             IS_IMPORTANT,
             REG_DATE
-        FROM CTG_NOTIC
-        WHERE NOTICE_ID =#{notice_id,jdbcType=NUMERIC};
+        FROM
+            CTG_NOTIC
+        WHERE
+            NOTICE_ID =#{notice_id,jdbcType=NUMERIC};
     </select>
 
     <select id="get_Notic_files" parameterType="_int" resultType="Notic">
@@ -79,7 +88,7 @@
         FROM
             CTG_NOTIC_FILES
         WHERE
-            notice_id = #{notice_id,jdbcType=NUMERIC};
+            NOTICE_ID = #{notice_id,jdbcType=NUMERIC};
     </select>
 
 </mapper>

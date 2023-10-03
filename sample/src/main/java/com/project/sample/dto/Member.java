@@ -23,5 +23,5 @@ public class Member {
     //데이터베이스에서는 사업자 유무를 가지고 판단후에 사업자 번호확인하는 식으로 진행하자
     private String business_number; //사업자번호
 
-    private String Method; //정보 들고올때 선택지
+    private String method; //정보 들고올때 선택지
 }

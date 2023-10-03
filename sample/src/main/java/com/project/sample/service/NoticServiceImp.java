@@ -55,11 +55,11 @@ public class NoticServiceImp implements NoticService {
     //공지사항 상세 조회
     @Transactional(readOnly = true)
     @Override
-    public Map<String,Object> get_Notic(int ntno) {
+    public Map<String,Object> get_Notic(int notice_id) {
         Map<String,Object> map = new HashMap<String,Object>();
 
-        map.put("Notic",noticDao.get_Notic(ntno));
-        map.put("Notic_files",noticDao.get_Notic_files(ntno));
+        map.put("Notic",noticDao.get_Notic(notice_id));
+        map.put("Notic_files",noticDao.get_Notic_files(notice_id));
 
         return map;
     }

@@ -10,5 +10,5 @@ import java.util.Map;
 public interface NoticService {
 
     public Notic2 get_Notic_List(Notic notic);
-    public Map<String,Object> get_Notic(int ntno);
+    public Map<String,Object> get_Notic(int notice_id);
 }

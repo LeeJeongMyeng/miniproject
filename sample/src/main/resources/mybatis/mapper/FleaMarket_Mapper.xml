@@ -24,7 +24,10 @@
    </insert>
 <!--플리마켓 게시글 등록시 파일업로드용 게시글 번호 조회-->
     <select id="FleaMarket_get_fno_max" resultType="_int">
-        SELECT MAX(POST_ID) FROM FLEAMARKET
+        SELECT
+            MAX(POST_ID)
+        FROM
+            FLEAMARKET
     </select>
 
 <!--플리마켓 파일등록-->
@@ -124,8 +127,10 @@
                CASE WHEN STR_TO_DATE(END_DATE, '%Y-%m-%d') < CURDATE() THEN '모집종료'
                 ELSE '모집중'
                 END AS STATE
-        FROM FLEAMARKET
-        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
+        FROM
+            FLEAMARKET
+        WHERE
+            POST_ID = #{post_id,jdbcType=NUMERIC}
 
         ]]>
     </select>
@@ -135,7 +140,8 @@
             *
         FROM
             FLEAMARKET_FILES
-        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
+        WHERE
+            POST_ID = #{post_id,jdbcType=NUMERIC}
     </select>
 
 <!--    플리마켓 게시글 삭제-->
@@ -156,14 +162,16 @@
 <!--    게시글 업데이트-->
     <update id="upt_FleaMarket" parameterType="FleamarketDto">
         UPDATE FLEAMARKET
-        SET  TITLE = #{title,jdbcType=VARCHAR},
+        SET
+             TITLE = #{title,jdbcType=VARCHAR},
              CONTENT = #{content,jdbcType=VARCHAR},
              LOCATION = #{location,jdbcType=VARCHAR},
              SUB_LOCATION = #{sub_location,jdbcType=VARCHAR},
              MAX_APPLICANTS = #{max_applicants,jdbcType=NUMERIC},
-             END_DATE = date_format(#{end_date,jdbcType=VARCHAR},'%Y-%m-%d'),
-             UPT_DATE = date_format(sysdate(),'%Y-%m-%d')
-        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
+             END_DATE = DATE_FORMAT(#{end_date,jdbcType=VARCHAR},'%Y-%m-%d'),
+             UPT_DATE = DATE_FORMAT(SYSDATE(),'%Y-%m-%d')
+        WHERE
+            POST_ID = #{post_id,jdbcType=NUMERIC}
     </update>
 
 <!-- 신청 등록   -->
@@ -192,9 +200,10 @@
 
         <!-- 게시글 삭제시 신청글도 삭제 -->
     <delete id="del_Application_FM" parameterType="_int">
-        DELETE
-        FROM APPLICATION_FM
-        WHERE POST_ID = #{post_id,jdbcType=NUMERIC}
+        DELETE FROM
+            APPLICATION_FM
+        WHERE
+            POST_ID = #{post_id,jdbcType=NUMERIC}
     </delete>
 
 <!--    특정 fno(글번호)에 대해 신청자(승인/대기/거절) 인원들고오기-->
@@ -212,12 +221,15 @@
                 CTG_MEMBER AS CM ON AF.USER_ID = CM.USER_ID
         WHERE
             AF.POST_ID = #{post_id,jdbcType=NUMERIC}
-          AND AF.STATE = #{state,jdbcType=VARCHAR}
+          AND
+            AF.STATE = #{state,jdbcType=VARCHAR}
     </select>
 
     <!-- 신청한 회원의 상태값 변경(수락/거절/대기)   -->
     <update id="upt_application_FM" parameterType="Application_FM">
-        UPDATE APPLICATION_FM SET
+        UPDATE
+            APPLICATION_FM
+        SET
             STATE = #{state,jdbcType=VARCHAR}
         WHERE
             POST_ID = #{post_id,jdbcType=NUMERIC}
@@ -260,26 +272,28 @@
 <!--내가 쓴 플리마켓글 조회-->
     <select id="get_My_FleaMarket" parameterType="FleamarketDto" resultType="FleamarketDto">
 
-        SELECT * FROM (
-                  SELECT
-                      (@ROWNUM := @ROWNUM + 1) as ROWNUM,
-                      F.POST_ID,
-                      CASE WHEN
-                               LENGTH(F.TITLE) > 50
-                               THEN
-                               CONCAT(LEFT(F.TITLE, 50), '...')
-                           ELSE
-                               F.TITLE END
-                          AS TITLE,
-                      SUBSTRING_INDEX(F.LOCATION, ' ', 2) AS LOCATION,
-                      F.MAX_APPLICANTS,
-                      F.CURRENT_COUNT
-                  FROM
-                      (SELECT @ROWNUM := 0) r, FLEAMARKET AS F
-                  WHERE
-                      F.USER_ID = #{user_id,jdbcType=VARCHAR}
-                  ORDER BY
-                      POST_ID
+        SELECT
+            *
+        FROM (
+              SELECT
+                  (@ROWNUM := @ROWNUM + 1) as ROWNUM,
+                  F.POST_ID,
+                  CASE WHEN
+                           LENGTH(F.TITLE) > 50
+                           THEN
+                           CONCAT(LEFT(F.TITLE, 50), '...')
+                       ELSE
+                           F.TITLE END
+                      AS TITLE,
+                  SUBSTRING_INDEX(F.LOCATION, ' ', 2) AS LOCATION,
+                  F.MAX_APPLICANTS,
+                  F.CURRENT_COUNT
+              FROM
+                  (SELECT @ROWNUM := 0) r, FLEAMARKET AS F
+              WHERE
+                  F.USER_ID = #{user_id,jdbcType=VARCHAR}
+              ORDER BY
+                  POST_ID
               ) AS T
         WHERE
             ROWNUM BETWEEN #{st_rownum,jdbcType=NUMERIC} AND #{en_rownum,jdbcType=NUMERIC}
@@ -296,7 +310,7 @@
 <!--내가 신청한 플리마켓 리스트-->
     <select id="get_My_Application" parameterType="FleamarketDto" resultType="FleamarketDto">
         <![CDATA[
-        SELECT * from
+        SELECT * FROM
             (SELECT
                  (@ROWNUM := @ROWNUM + 1) as ROWNUM,T.*
              FROM

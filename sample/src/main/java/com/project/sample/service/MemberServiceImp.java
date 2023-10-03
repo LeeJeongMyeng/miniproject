@@ -49,8 +49,8 @@ public class MemberServiceImp implements MemberService {
     public int Ins_Ctg_Member(Member member) throws IllegalAccessException {
         //사업자도 추가해야함..
 
-        member.set_business(member.getBusiness_number() != null);
-
+        member.set_business(member.getBusiness_number() != null && !member.getBusiness_number().equals(""));
+        System.out.println(member.is_business());
         // Member 클래스 모든 필드를 가져 옴
         Field[] fields = member.getClass().getDeclaredFields();
 
@@ -73,9 +73,10 @@ public class MemberServiceImp implements MemberService {
 
                     // getter로 호출하여 현재 문자열 필드의 원래 값을 얻습니다.
                     String originalValue = (String) getter.invoke(member);
-
+                    System.out.println(methodName);
+                    System.out.println("origin_value: "+originalValue);
                     //값이 NULL이 아닐경우
-                    boolean NullCheck = originalValue != null;
+                    boolean NullCheck = originalValue != null && !originalValue.equals("");
 
                     // 현재 문자열이 password라면 executeMethodA 실행, 그렇지 않다면 executeMethodB 실행
                     if(NullCheck){
@@ -124,7 +125,7 @@ public class MemberServiceImp implements MemberService {
         String user_id;
 
         //회원 정보가 존재할경우
-        if(memberInfo.getUser_id() != null){
+        if(memberInfo != null && memberInfo.getUser_id() != null){
             //평문 pwd와 암호화 pwd비교
             String Origin_pwd = member.getPassword();
             String Hash_pwd = memberInfo.getPassword();
@@ -145,10 +146,10 @@ public class MemberServiceImp implements MemberService {
             //memberInfo = null;
             user_id = null;
         }
-
         return user_id;
     }
 
+    //내정보 들고오기
     @Override
     public Member get_My_Info(Member member)
             throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
@@ -174,12 +175,66 @@ public class MemberServiceImp implements MemberService {
 //        return null;
     }
 
+    //수정 전 기존 값과 동일한지 체크
     @Override
     public boolean Check_Password(Member member) {
 
-        String EncPassword = dao.Check_Password(member.getUser_id());
+        boolean result = false;
+        try {
 
-        return aes.checkBcrypt(member.getPassword(),EncPassword);
+            String Encvalue = dao.Check_Password(member);
+            String[] properties = {"Password","Phone_number","Business_number"};
+            for (String property : properties) {
+                Method getter = Member.class.getMethod("get" + property);
+                String value = (String) getter.invoke(member);
+                if (value != null) {
+
+                    if(property.equals("Password")){
+                        result = aes.checkBcrypt(value,Encvalue);
+                    }else{
+                        result = value.equals(aes.decrypt(Encvalue));
+                    }
+                }
+            }
+
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    //회원정보 수정
+    @Override
+    public int MyInfo_Update(Member member) {
+        try {
+            System.out.println("수정 is_active"+member.is_active());
+
+            String[] properties = {"Password", "Address","Extra_address","Detail_address", "Phone_number", "Business_number"};
+            for (String property : properties) {
+                Method getter = Member.class.getMethod("get" + property);
+                String value = (String) getter.invoke(member);
+
+                if (value != null) {
+
+                    if(property.equals("Password")){
+                        value = aes.hashBcrypt(value);
+                    }else{
+                        value = aes.encrypt(value);
+                    }
+                    Method setter = Member.class.getMethod("set" + property, String.class);
+                    setter.invoke(member, value);
+
+                }
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        System.out.println("비번 업데이트 잘처리됨");
+        return dao.MyInfo_Update(member);
+    }
+    //회원탈퇴
+    @Override
+    public int delete_Member(Member member) {
+        return dao.delete_Member(member);
     }
 
 

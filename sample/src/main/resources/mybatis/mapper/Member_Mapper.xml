@@ -60,17 +60,14 @@
             ADDRESS,
             JOIN_DATE,
         </if>
-
+        IS_ACTIVE,
         EMAIL
         FROM
         CTG_MEMBER
-        WHERE
-        IS_ACTIVE = 1
-
+        WHERE IS_ACTIVE = 1
         <if test="method == 'Login'">
-            AND EMAIL = #{email,jdbcType=VARCHAR}
+            AND  EMAIL = #{email,jdbcType=VARCHAR}
         </if>
-
         <if test="method == 'MyInfo'">
             AND USER_ID = #{user_id,jdbcType=VARCHAR}
         </if>
@@ -85,15 +82,50 @@
             USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
     
-    <select id="Check_Password"  parameterType="String" resultType="String">
+    <select id="Check_Password"  parameterType="Member" resultType="String">
         SELECT
-            PASSWORD
+            <if test="password != null">
+                PASSWORD
+            </if>
+            <if test="phone_number != null">
+                PHONE_NUMBER
+            </if>
         FROM
             CTG_MEMBER
         WHERE
             USER_ID = #{user_id,jdbcType=VARCHAR}
     </select>
 
+    <update id="MyInfo_Update" parameterType="Member">
+        UPDATE CTG_MEMBER
+        SET
 
+        <if test="password != null">
+            PASSWORD = #{password,jdbcType=VARCHAR}
+        </if>
+        <if test="address != null">
+            POSTAL_CODE = #{postal_code,jdbcType=NUMERIC},
+            ADDRESS = #{address,jdbcType=VARCHAR},
+            EXTRA_ADDRESS = #{extra_address,jdbcType=VARCHAR},
+            DETAIL_ADDRESS = #{detail_address,jdbcType=VARCHAR}
 
+        </if>
+        <if test="phone_number != null">
+            PHONE_NUMBER = #{phone_number,jdbcType=VARCHAR}
+        </if>
+        <if test="business_number != null">
+            BUSINESS_NUMBER = #{business_number,jdbcType=VARCHAR},
+            IS_BUSINESS = TRUE
+        </if>
+        WHERE
+        USER_ID = #{user_id,jdbcType=VARCHAR}
+    </update>
+    <update id="delete_Member" parameterType="Member">
+        UPDATE
+            CTG_MEMBER
+        SET
+            IS_ACTIVE = #{is_active,jdbcType=VARCHAR}
+        WHERE
+            USER_ID = #{user_id,jdbcType=VARCHAR}
+    </update>
 </mapper>

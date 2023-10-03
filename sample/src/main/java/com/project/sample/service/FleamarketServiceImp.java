@@ -58,21 +58,26 @@ public class FleamarketServiceImp implements FleamarketService {
                 fleamarketDao.upt_FleaMarket(fleamarketDto);
 
                 int post_id = fleamarketDto.getPost_id();
-                //파일 리스트 부터 가져옴
-                List<Fleamarket_Files> fleamarket_files = fleamarketDao.get_FleaMarket_files(post_id);
+                if (files != null && !files.isEmpty()) {
 
-                System.out.println(post_id);
 
-                for(Fleamarket_Files file:fleamarket_files){
-                    System.out.println(file.getUuid_file_name());
-                }
+                    //파일 리스트 부터 가져옴
+                    List<Fleamarket_Files> fleamarket_files = fleamarketDao.get_FleaMarket_files(post_id);
 
-                //DB정보삭제
-                fleamarketDao.del_FleaMarket_files(post_id);
+                    System.out.println(post_id);
 
-                //삭제처리
-                for(Fleamarket_Files file_Info:fleamarket_files){
-                    fileservice.DeleteFile(file_Info.getUuid_file_name());
+                    for(Fleamarket_Files file:fleamarket_files){
+                        System.out.println(file.getUuid_file_name());
+                    }
+
+                    //DB정보삭제
+                    fleamarketDao.del_FleaMarket_files(post_id);
+
+                    //삭제처리
+                    for(Fleamarket_Files file_Info:fleamarket_files){
+                        System.out.println("파일삭제처리");
+                        fileservice.DeleteFile(file_Info.getUuid_file_name());
+                    }
                 }
                 post_id_max = fleamarketDto.getPost_id();
             }

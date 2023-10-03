@@ -17,8 +17,9 @@ import java.util.UUID;
 public class FileService {
 //    @Value("${fileUpload}")
 //    private String path;
-      //String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
-      String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
+//      String path = "E:\\workspace\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
+      String path = "E:\\workspace\\git\\miniproject\\sample\\src\\main\\resources\\fleamarket\\img";
+//      String path = "C:\\Users\\TA9\\git\\vue-app\\src\\assets\\img\\fleamarket\\";
 
 
     //파일 생성(UUID)
@@ -56,7 +57,7 @@ public class FileService {
     //파일 삭제처리
     public void DeleteFile(String filename) {
 
-        String filePath= path+filename;
+        String filePath= path+"\\"+filename;
         System.out.println(filePath);
         File f = new File(filePath);
         if(f.exists()) {f.delete();}

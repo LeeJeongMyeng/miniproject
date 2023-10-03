@@ -67,7 +67,7 @@ public class CommonController {
             String member = (String) claims.get("user_id");
             return new ResponseEntity<>(member, HttpStatus.OK);
         }else{
-            return new ResponseEntity<>("",HttpStatus.OK);
+            return new ResponseEntity<>("로그인 이후 실행",HttpStatus.OK);
         }
     }
 

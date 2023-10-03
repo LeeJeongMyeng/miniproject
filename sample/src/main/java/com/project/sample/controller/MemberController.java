@@ -65,7 +65,7 @@ public class MemberController {
     }
 
     //로그인
-    @PostMapping("/ctg/SignIn_Ctg_Member")
+    @RequestMapping("/ctg/SignIn_Ctg_Member")
     public ResponseEntity SignIn_Ctg_Member(@RequestBody Member member, HttpServletResponse res) throws IllegalAccessException {
 
        System.out.println("로그인(/ctg/SignIn_Ctg_Member) 실행");
@@ -82,7 +82,8 @@ public class MemberController {
             res.addCookie(cookie);
             return new ResponseEntity<>(userid,HttpStatus.OK);
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        System.out.println("dd");
+        return new ResponseEntity<>("일치하는 회원 정보가 없습니다.", HttpStatus.NOT_FOUND);
     }
 
 
@@ -109,9 +110,21 @@ public class MemberController {
 
     @PostMapping("/ctg/Check_Password")
     public boolean Check_Password(@RequestBody Member member){
-        System.out.println(member.getUser_id());
-        System.out.println(member.getPassword());
         return service.Check_Password(member);
     }
+
+    @PostMapping("/ctg/MyInfo_Update")
+    public int MyInfo_Update(@RequestBody Member member) {
+        System.out.println("업데이트 실행");
+        return service.MyInfo_Update(member);
+    }
+    @PostMapping("/ctg/delete_Member")
+    public int delete_Member(@RequestBody Member member) {
+        System.out.println("업데이트 실행");
+        System.out.println(member.is_active());
+        System.out.println(member.getUser_id());
+        return service.delete_Member(member);
+    }
+
 
 }

@@ -24,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SampleInterceptor(jwtservice,memberDao)) // LogInterceptor 등록
                 .order(1)	// 적용할 필터 순서 설정
                 .addPathPatterns("/ctg/check-user-bn")
-                .excludePathPatterns("/error","/ctg/logout","/ctg/account_check"); // 인터셉터에서 제외할 패턴
+                .excludePathPatterns("/error","/ctg/logout"); // 인터셉터에서 제외할 패턴
 
         //registry.addInterceptor(new SampleInterceptor(jwtservice))
         // LoginCheckInterceptor 등록

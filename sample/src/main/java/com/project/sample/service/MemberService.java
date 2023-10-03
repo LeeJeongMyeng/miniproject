@@ -13,4 +13,6 @@ public interface MemberService {
     public int BN_Check(Member member);
     public Member get_My_Info(Member member) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException;
     public boolean Check_Password(Member member);
+    int MyInfo_Update(Member member);
+    int delete_Member(Member member);
 }
